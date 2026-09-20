@@ -6,6 +6,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-amber.svg)](LICENSE)
 [![Render](https://img.shields.io/badge/Render-Live%20Demo-46E3B7.svg?logo=render&logoColor=white)](https://lifenexus-pouw.onrender.com/)
+[![Demo Video](https://img.shields.io/badge/Demo%20Video-Watch%20Walkthrough-red.svg?logo=google-drive&logoColor=white)](https://drive.google.com/file/d/1e5qKOygComl3sJWTskR7U-ILEV9Xulqd/view)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue.svg)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-18.3-cyan.svg)](https://reactjs.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-20+-green.svg)](https://nodejs.org/)
@@ -20,13 +21,19 @@
 
 ---
 
-## 🔗 Live Application
+## 🔗 Live Application & Demo Video
 
 > [!TIP]
 > **Production Live URL:**  
 > **👉 [https://lifenexus-pouw.onrender.com/](https://lifenexus-pouw.onrender.com/)**  
 > 
 > *Full single-app production deployment running on Render (Unified Express API + React Vite Client + In-Memory / MongoDB Atlas Storage).*
+
+> [!NOTE]
+> **Demo Video Walkthrough:**  
+> **🎬 [Watch LIFENEXUS Video Demonstration](https://drive.google.com/file/d/1e5qKOygComl3sJWTskR7U-ILEV9Xulqd/view)**  
+> 
+> *Complete walkthrough demonstrating document ingestion, entity & relationship extraction, interactive knowledge graph exploration, and grounded life search.*
 
 ---
 
