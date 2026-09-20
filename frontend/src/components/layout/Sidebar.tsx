@@ -15,15 +15,14 @@ const ACTIVE_NAV_ITEMS = [
   { name: 'Overview', path: '/app/dashboard', icon: LayoutDashboard },
   { name: 'Life Search', path: '/app/search', icon: Search },
   { name: 'Life Timeline', path: '/app/timeline', icon: Clock },
+  { name: 'Life Insights', path: '/app/insights', icon: Lightbulb },
   { name: 'Life Graph', path: '/app/graph', icon: Network },
   { name: 'Documents', path: '/app/documents', icon: FileText },
   { name: 'Import Documents', path: '/app/import', icon: UploadCloud },
   { name: 'Privacy Sandbox', path: '/app/privacy', icon: ShieldCheck },
 ];
 
-const UPCOMING_NAV_ITEMS = [
-  { name: 'Life Insights', path: '/app/insights', icon: Lightbulb, badge: 'Phase 7' },
-];
+const UPCOMING_NAV_ITEMS: Array<{ name: string; path: string; icon: any; badge: string }> = [];
 
 
 export const Sidebar: React.FC = () => {

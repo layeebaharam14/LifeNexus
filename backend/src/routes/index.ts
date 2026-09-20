@@ -3,6 +3,7 @@ import { authRoutes } from './authRoutes.js';
 import { documentRoutes } from './documentRoutes.js';
 import { memoryRoutes } from './memoryRoutes.js';
 import { searchRoutes } from './searchRoutes.js';
+import { insightsRoutes } from './insightsRoutes.js';
 import { ApiResponse } from '../types/api.js';
 
 export const apiRouter = Router();
@@ -30,4 +31,7 @@ apiRouter.use('/memory', memoryRoutes);
 
 // Life Search Routes (Phase 5)
 apiRouter.use('/search', searchRoutes);
+
+// Life Insights Routes (Phase 7)
+apiRouter.use('/insights', insightsRoutes);
 

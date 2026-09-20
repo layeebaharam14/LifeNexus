@@ -12,6 +12,7 @@ import { PrivacyPage } from './pages/PrivacyPage.js';
 import { GraphPage } from './pages/GraphPage.js';
 import { SearchPage } from './pages/SearchPage.js';
 import { TimelinePage } from './pages/TimelinePage.js';
+import { InsightsPage } from './pages/InsightsPage.js';
 import { AuthenticatedWorkspacePage } from './pages/AuthenticatedWorkspacePage.js';
 
 // Protected Route Guard for Authenticated Users Only
@@ -99,6 +100,7 @@ export const App: React.FC = () => {
             <Route path="graph" element={<GraphPage />} />
             <Route path="search" element={<SearchPage />} />
             <Route path="timeline" element={<TimelinePage />} />
+            <Route path="insights" element={<InsightsPage />} />
             <Route path="privacy" element={<PrivacyPage />} />
             <Route path="profile" element={<AuthenticatedWorkspacePage />} />
             <Route path="*" element={<Navigate to="/app/dashboard" replace />} />

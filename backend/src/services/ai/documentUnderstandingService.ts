@@ -220,6 +220,23 @@ export async function getUserDocumentUnderstanding(
   }
 }
 
+export async function getAllUserDocumentUnderstandings(
+  userId: string
+): Promise<DocumentUnderstandingDTO[]> {
+  if (isDbConnected()) {
+    const records = await DocumentUnderstandingModel.find({ userId, status: 'COMPLETED' });
+    return records.map((r) => formatUnderstandingDTO(r));
+  } else {
+    const list: DocumentUnderstandingDTO[] = [];
+    for (const record of inMemoryUnderstandings.values()) {
+      if (record.userId === userId && record.status === 'COMPLETED') {
+        list.push(formatMemoryUnderstandingDTO(record));
+      }
+    }
+    return list;
+  }
+}
+
 async function saveUnderstandingRecord(data: {
   userId: string;
   documentId: string;

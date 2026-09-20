@@ -17,6 +17,7 @@ import { Button } from '../components/common/Button.js';
 import { Badge } from '../components/common/Badge.js';
 import { getDocuments } from '../services/documentService.js';
 import { getMemoryStats, MemoryStats } from '../services/memoryService.js';
+import { getInsights, GroundedInsight } from '../services/insightsService.js';
 import { DocumentRecord } from '../types/index.js';
 
 export const DashboardPage: React.FC = () => {
@@ -24,6 +25,8 @@ export const DashboardPage: React.FC = () => {
   const [recentDocs, setRecentDocs] = useState<DocumentRecord[]>([]);
   const [isLoadingDocs, setIsLoadingDocs] = useState<boolean>(true);
   const [memStats, setMemStats] = useState<MemoryStats>({ memories: 0, entities: 0, relationships: 0, timelineEvents: 0 });
+  const [attentionCount, setAttentionCount] = useState<number>(0);
+  const [topInsights, setTopInsights] = useState<GroundedInsight[]>([]);
 
   useEffect(() => {
     const fetchRecentDocs = async () => {
@@ -50,8 +53,21 @@ export const DashboardPage: React.FC = () => {
       }
     };
 
+    const fetchInsightsData = async () => {
+      try {
+        const res = await getInsights();
+        if (res.success && res.data) {
+          setAttentionCount(res.data.summary.attention);
+          setTopInsights(res.data.insights.slice(0, 3));
+        }
+      } catch (_err) {
+        // Handled gracefully
+      }
+    };
+
     fetchRecentDocs();
     fetchMemStats();
+    fetchInsightsData();
   }, []);
 
   const formatDate = (dateStr: string): string => {
@@ -213,7 +229,10 @@ export const DashboardPage: React.FC = () => {
           </p>
         </Card>
 
-        <Card>
+        <Card
+          onClick={() => navigate('/app/insights')}
+          style={{ cursor: 'pointer', transition: 'transform 0.15s ease' }}
+        >
           <div
             style={{
               display: 'flex',
@@ -225,13 +244,13 @@ export const DashboardPage: React.FC = () => {
             <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-muted-brown)' }}>
               Attention Needed
             </span>
-            <AlertTriangle size={20} color="var(--color-muted-brown)" />
+            <AlertTriangle size={20} color={attentionCount > 0 ? 'var(--color-nexus-orange)' : 'var(--color-muted-brown)'} />
           </div>
-          <div style={{ fontSize: '32px', fontWeight: 800, color: 'var(--color-deep-cocoa)' }}>
-            0
+          <div style={{ fontSize: '32px', fontWeight: 800, color: attentionCount > 0 ? 'var(--color-nexus-orange)' : 'var(--color-deep-cocoa)' }}>
+            {attentionCount}
           </div>
-          <p style={{ fontSize: '12px', color: 'var(--color-muted-brown)', marginTop: '4px' }}>
-            No upcoming alerts
+          <p style={{ fontSize: '12px', color: attentionCount > 0 ? 'var(--color-nexus-orange)' : 'var(--color-muted-brown)', marginTop: '4px', fontWeight: 500 }}>
+            {attentionCount > 0 ? `${attentionCount} item(s) require action →` : 'No upcoming alerts'}
           </p>
         </Card>
       </div>
@@ -323,7 +342,7 @@ export const DashboardPage: React.FC = () => {
           )}
         </Card>
 
-        {/* Proactive Expiration Insights */}
+        {/* Proactive Life Insights Card */}
         <Card>
           <div
             style={{
@@ -334,28 +353,61 @@ export const DashboardPage: React.FC = () => {
             }}
           >
             <h3 style={{ fontSize: '16px', fontWeight: 700, color: 'var(--color-deep-cocoa)' }}>
-              Proactive Expiration Insights
+              Proactive Life Insights
             </h3>
-            <Badge variant="peach">Phase 4 Feature</Badge>
+            <Button variant="ghost" size="sm" onClick={() => navigate('/app/insights')}>
+              View All <ArrowRight size={14} />
+            </Button>
           </div>
 
-          <div
-            style={{
-              padding: '32px 16px',
-              textAlign: 'center',
-              backgroundColor: 'var(--color-warm-cream)',
-              borderRadius: 'var(--radius-md)',
-              border: '1px solid var(--color-border-subtle)',
-            }}
-          >
-            <Clock size={28} color="var(--color-muted-brown)" style={{ marginBottom: '8px' }} />
-            <p style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-deep-cocoa)', marginBottom: '4px' }}>
-              No active expiration alerts
-            </p>
-            <p style={{ fontSize: '12px', color: 'var(--color-muted-brown)' }}>
-              Proactive warranty, subscription, and policy expiration tracking will activate after AI Understanding in Phase 4.
-            </p>
-          </div>
+          {topInsights.length === 0 ? (
+            <div
+              style={{
+                padding: '32px 16px',
+                textAlign: 'center',
+                backgroundColor: 'var(--color-warm-cream)',
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid var(--color-border-subtle)',
+              }}
+            >
+              <Sparkles size={28} color="var(--color-muted-brown)" style={{ marginBottom: '8px' }} />
+              <p style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-deep-cocoa)', marginBottom: '4px' }}>
+                Your insights are forming
+              </p>
+              <p style={{ fontSize: '12px', color: 'var(--color-muted-brown)' }}>
+                Import documents and run AI understanding to surface grounded attention items and patterns.
+              </p>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {topInsights.map((ins) => (
+                <div
+                  key={ins.id}
+                  onClick={() => navigate('/app/insights')}
+                  style={{
+                    padding: '12px',
+                    borderRadius: 'var(--radius-md)',
+                    background: ins.priority === 'attention' ? 'rgba(244, 122, 69, 0.08)' : 'var(--color-warm-cream)',
+                    border: '1px solid',
+                    borderColor: ins.priority === 'attention' ? 'rgba(244, 122, 69, 0.3)' : 'var(--color-border-subtle)',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                    <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-deep-cocoa)' }}>
+                      {ins.title}
+                    </span>
+                    <Badge variant={ins.priority === 'attention' ? 'orange' : 'peach'} style={{ fontSize: '10px' }}>
+                      {ins.priority.toUpperCase()}
+                    </Badge>
+                  </div>
+                  <p style={{ fontSize: '12px', color: 'var(--color-muted-brown)', lineHeight: '1.4' }}>
+                    {ins.description}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
         </Card>
       </div>
     </div>
