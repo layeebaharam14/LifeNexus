@@ -22,6 +22,13 @@
   "license": "MIT",
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/jsonwebtoken": "^9.0.8",
+    "@types/multer": "^1.4.12",
+    "@types/node": "^22.10.7",
+    "@types/pdf-parse": "^1.1.4",
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
@@ -32,18 +39,9 @@
     "pdf-lib": "^1.17.1",
     "pdf-parse": "^1.1.1",
     "tesseract.js": "^5.1.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3",
     "unpdf": "^1.8.1",
     "zod": "^3.24.1"
-  },
-  "devDependencies": {
-    "@types/bcryptjs": "^2.4.6",
-    "@types/cors": "^2.8.17",
-    "@types/express": "^4.17.21",
-    "@types/jsonwebtoken": "^9.0.8",
-    "@types/multer": "^1.4.12",
-    "@types/node": "^22.10.7",
-    "@types/pdf-parse": "^1.1.4",
-    "tsx": "^4.19.2",
-    "typescript": "^5.7.3"
   }
 }

@@ -4,7 +4,7 @@
   "private": true,
   "description": "LIFENEXUS — Personal Knowledge Graph & Memory Engine",
   "scripts": {
-    "postinstall": "npm install --prefix backend && npm install --prefix frontend",
+    "postinstall": "npm install --include=dev --prefix backend && npm install --include=dev --prefix frontend",
     "build:frontend": "npm run build --prefix frontend",
     "build:backend": "npm run build --prefix backend",
     "build": "npm run build:frontend && npm run build:backend",
