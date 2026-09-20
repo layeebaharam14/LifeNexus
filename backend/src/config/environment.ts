@@ -12,4 +12,8 @@ export const ENV = {
   JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || '7d',
   UPLOAD_DIR: process.env.UPLOAD_DIR || path.join(process.cwd(), 'uploads'),
   MAX_FILE_SIZE_MB: process.env.MAX_FILE_SIZE_MB ? parseInt(process.env.MAX_FILE_SIZE_MB, 10) : 15,
+  GEMINI_API_KEY: process.env.GEMINI_API_KEY || '',
+  GEMINI_MODEL: process.env.GEMINI_MODEL || 'gemini-1.5-flash',
+  MAX_DOCUMENT_TEXT_CHARS: process.env.MAX_DOCUMENT_TEXT_CHARS ? parseInt(process.env.MAX_DOCUMENT_TEXT_CHARS, 10) : 25000,
 };
+

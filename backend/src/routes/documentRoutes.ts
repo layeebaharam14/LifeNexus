@@ -7,6 +7,8 @@ import {
   getDocumentDetailController,
   getDocumentContentController,
   deleteDocumentController,
+  understandDocumentController,
+  getDocumentUnderstandingController,
 } from '../controllers/documentController.js';
 
 export const documentRoutes = Router();
@@ -26,6 +28,11 @@ documentRoutes.get('/:id', getDocumentDetailController);
 // Get extracted content of a document
 documentRoutes.get('/:id/content', getDocumentContentController);
 
+// Phase 4A: Trigger or get AI Document Understanding
+documentRoutes.post('/:id/understand', understandDocumentController);
+documentRoutes.get('/:id/understanding', getDocumentUnderstandingController);
+
 // Delete user's document
 documentRoutes.delete('/:id', deleteDocumentController);
+
 

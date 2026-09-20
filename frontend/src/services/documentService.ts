@@ -1,5 +1,5 @@
-import { apiGet, apiUpload, apiDelete } from './api.js';
-import { ApiResponse, DocumentRecord } from '../types/index.js';
+import { apiGet, apiPost, apiUpload, apiDelete } from './api.js';
+import { ApiResponse, DocumentRecord, DocumentUnderstandingRecord } from '../types/index.js';
 
 export interface DocumentContentResult {
   documentId: string;
@@ -38,6 +38,22 @@ export async function getDocumentContent(
   id: string
 ): Promise<ApiResponse<{ content: DocumentContentResult }>> {
   return apiGet<{ content: DocumentContentResult }>(`/documents/${id}/content`);
+}
+
+export async function understandDocument(
+  id: string,
+  reprocess: boolean = false
+): Promise<ApiResponse<{ understanding: DocumentUnderstandingRecord; cached?: boolean }>> {
+  return apiPost<{ understanding: DocumentUnderstandingRecord; cached?: boolean }>(
+    `/documents/${id}/understand`,
+    { reprocess }
+  );
+}
+
+export async function getDocumentUnderstanding(
+  id: string
+): Promise<ApiResponse<{ understanding: DocumentUnderstandingRecord }>> {
+  return apiGet<{ understanding: DocumentUnderstandingRecord }>(`/documents/${id}/understanding`);
 }
 
 export async function deleteDocument(id: string): Promise<ApiResponse<{ deletedId: string }>> {

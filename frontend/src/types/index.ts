@@ -71,6 +71,76 @@ export interface SearchResult {
   relatedEvents: TimelineEvent[];
 }
 
+export interface ExtractedEntity {
+  name: string;
+  type: 'PERSON' | 'ORGANIZATION' | 'PRODUCT' | 'PLACE' | 'SERVICE' | 'ACCOUNT' | 'OTHER';
+  normalizedName?: string;
+  confidence: number;
+  evidence?: string;
+}
+
+export interface ExtractedDate {
+  value: string;
+  type: 'PURCHASE' | 'EXPIRY' | 'START' | 'END' | 'EVENT' | 'ISSUE' | 'RENEWAL' | 'OTHER';
+  precision: 'DAY' | 'MONTH' | 'YEAR' | 'UNKNOWN';
+  confidence: number;
+  evidence?: string;
+}
+
+export interface ExtractedAmount {
+  value: number;
+  currency: string;
+  type: 'PURCHASE' | 'PAYMENT' | 'PREMIUM' | 'REFUND' | 'OTHER';
+  confidence: number;
+  evidence?: string;
+}
+
+export interface ExtractedEvent {
+  title: string;
+  date?: string | null;
+  datePrecision?: 'DAY' | 'MONTH' | 'YEAR' | 'UNKNOWN';
+  description?: string;
+  confidence: number;
+  evidence?: string;
+}
+
+export interface ExtractedIdentifier {
+  type: string;
+  value: string;
+  confidence: number;
+  evidence?: string;
+}
+
+export interface ExtractedRelationship {
+  from: string;
+  relationship: string;
+  to: string;
+  confidence: number;
+  evidence?: string;
+}
+
+export interface DocumentUnderstandingRecord {
+  id?: string;
+  userId: string;
+  documentId: string;
+  documentClassification: {
+    type: string;
+    confidence: number;
+  };
+  summary?: string;
+  entities: ExtractedEntity[];
+  dates: ExtractedDate[];
+  amounts: ExtractedAmount[];
+  events: ExtractedEvent[];
+  identifiers: ExtractedIdentifier[];
+  relationships: ExtractedRelationship[];
+  aiModel: string;
+  promptVersion: string;
+  status: 'NOT_STARTED' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
+  errorMessage?: string | null;
+  processedAt?: string;
+}
+
 export interface ExpirationAlert {
   id: string;
   title: string;

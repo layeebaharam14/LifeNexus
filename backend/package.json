@@ -7,7 +7,9 @@
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "test": "echo \"Running backend tests...\""
+    "test": "echo \"Running backend tests...\"",
+    "test:phase3": "tsx src/test_phase3.ts",
+    "test:phase4a": "tsx src/test_phase4a.ts"
   },
   "keywords": [
     "lifenexus",
