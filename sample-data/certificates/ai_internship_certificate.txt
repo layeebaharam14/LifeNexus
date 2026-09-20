@@ -1,0 +1,26 @@
+NEXUSAITECH INNOVATIONS LABS
+CERTIFICATE OF INTERNSHIP COMPLETION
+------------------------------------------------------------
+Certificate ID: CERT-NX-2025-0812
+Issue Date: August 31, 2025
+
+This is to proudly certify that
+
+ALEX MORGAN
+
+has successfully completed a 3-month Summer Internship as an
+AI Research & Engineering Intern at NexusAITech Labs, Bangalore,
+from June 1, 2025 to August 31, 2025.
+
+Key Contributions & Projects:
+- Researched Knowledge Graph embeddings and Neuro-symbolic retrieval.
+- Developed an automated document entity extraction pipeline using LLMs.
+- Delivered the "Project LifeNexus Prototype" presented to executive leadership.
+
+Performance Rating: Outstanding (Grade A+)
+
+Dr. Arvind Swaminathan
+Head of AI Research, NexusAITech Labs
+Bangalore, India
+------------------------------------------------------------
+Verify online at: https://verify.nexusai.tech/CERT-NX-2025-0812

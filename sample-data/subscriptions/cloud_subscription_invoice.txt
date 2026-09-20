@@ -1,0 +1,27 @@
+CLOUDNEXUS SERVICES INC.
+MONTHLY SUBSCRIPTION TAX INVOICE
+------------------------------------------------------------
+Invoice Number: INV-CN-2026-08812
+Billing Date: August 1, 2026
+Billing Period: August 1, 2026 - August 31, 2026
+
+CUSTOMER:
+Alex Morgan
+Account ID: USR-98214
+Bangalore, India
+
+SUBSCRIPTION SUMMARY:
+------------------------------------------------------------
+Plan: CloudNexus Pro Developer Tier (Monthly Recurring)
+Includes:
+- 500GB Encrypted Cloud Storage
+- Vector Search & Embeddings Compute (10M tokens/mo)
+- Automated Daily Backup Service
+
+Monthly Fee: ₹1,499.00
+GST (18%): ₹269.82
+Total Charged: ₹1,768.82
+Payment Method: Auto-Debit Credit Card ending in 4092
+Next Renewal Date: September 1, 2026
+------------------------------------------------------------
+Manage subscription at: https://cloudnexus.io/billing

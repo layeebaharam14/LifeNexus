@@ -1,0 +1,34 @@
+INDIGO AIRLINES - E-TICKET & BOARDING ITINERARY
+------------------------------------------------------------
+Booking Reference (PNR): NX7K9Q
+Ticket Issue Date: December 10, 2025
+Passenger: Alex Morgan
+
+FLIGHT DETAILS:
+------------------------------------------------------------
+Flight: 6E-512
+Date of Travel: December 13, 2025
+Origin: Bangalore (BLR) - Kempegowda International Airport, Terminal 1
+Destination: Hyderabad (HYD) - Rajiv Gandhi International Airport
+Departure: 06:45 AM
+Arrival: 07:55 AM
+Seat: 12F (Window)
+Class: Economy (Corporate Flex)
+
+RETURN FLIGHT:
+------------------------------------------------------------
+Flight: 6E-884
+Date of Travel: December 15, 2025
+Origin: Hyderabad (HYD)
+Destination: Bangalore (BLR)
+Departure: 08:30 PM
+Arrival: 09:40 PM
+Seat: 14A
+
+PAYMENT SUMMARY:
+Base Fare: ₹4,800.00
+Taxes & Fees: ₹1,450.00
+Total Fare Paid: ₹6,250.00
+Payment Method: Net Banking (HDFC Bank)
+Purpose: Attending HACKDAY 2025 Hackathon at Hyderabad
+------------------------------------------------------------

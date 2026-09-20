@@ -1,0 +1,30 @@
+AUTHORIZED SERVICE CENTER - JOB SHEET & SERVICE RECEIPT
+------------------------------------------------------------
+Service Center: F1 Info Solutions & Services (Asus Authorized)
+Address: 100ft Road, Indiranagar, Bangalore - 560038
+Service Receipt No: SR-ASUS-2026-0741
+Service Date: July 22, 2026
+
+CUSTOMER & DEVICE DETAILS:
+Customer Name: Alex Morgan
+Contact: +91 98765 43210
+Device Model: ASUS Vivobook 15 OLED
+Serial Number: NX8821-ASUS-2026
+Warranty Status: Active under Asus Premium Care (APC-2026-991827)
+
+ISSUE REPORTED:
+Customer reported flickering horizontal lines on OLED screen after continuous usage.
+
+DIAGNOSIS & WORK PERFORMED:
+- Display flex cable replaced and display firmware recalibrated.
+- Thermal paste re-applied on CPU heat sink.
+- Complete hardware diagnostic passed: 100% OK.
+
+SERVICE CHARGES:
+Parts Replaced: EDP Display Cable
+Labor Charges: ₹0.00 (Covered under Extended Warranty)
+Total Amount Billed: ₹0.00
+
+Device tested and delivered back to customer on July 24, 2026.
+Technician: Rajesh Kumar (Badge #TK-402)
+------------------------------------------------------------

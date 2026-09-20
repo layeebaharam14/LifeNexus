@@ -1,0 +1,31 @@
+TAX INVOICE / RETAIL RECEIPT
+------------------------------------------------------------
+RETAILER: Croma Electronics Retail Ltd.
+Store: Indiranagar, Bangalore, Karnataka - 560038
+GSTIN: 29AABCC1234F1Z5
+Invoice No: INV-2026-CR8921
+Date: March 14, 2026
+
+CUSTOMER DETAILS:
+Name: Alex Morgan
+Email: alex.morgan@example.com
+Phone: +91 98765 43210
+
+ITEM DETAILS:
+------------------------------------------------------------
+Item: ASUS Vivobook 15 OLED (2026 Edition)
+Model No: M1505YA-OLED
+Serial Number: NX8821-ASUS-2026
+Processor: AMD Ryzen 7 7730U / 16GB RAM / 512GB NVMe SSD
+Color: Indie Black
+
+Qty: 1
+Base Price: ₹57,627.12
+CGST (9%): ₹5,186.44
+SGST (9%): ₹5,186.44
+------------------------------------------------------------
+TOTAL AMOUNT PAID: ₹68,000.00
+Payment Mode: UPI (HDFC Bank Ref: 98127391823)
+Warranty: 1 Year Standard Manufacturer Warranty included.
+------------------------------------------------------------
+Thank you for shopping at Croma!
