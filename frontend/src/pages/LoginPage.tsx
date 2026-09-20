@@ -1,31 +1,38 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Network, Lock, Mail, ArrowRight } from 'lucide-react';
+import { Network, Lock, Mail, ArrowRight, AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.js';
 import { Button } from '../components/common/Button.js';
 import { Card } from '../components/common/Card.js';
 
 export const LoginPage: React.FC = () => {
-  const [email, setEmail] = useState('demo@lifenexus.io');
-  const [password, setPassword] = useState('password123');
-  const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const { loginUser } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setError(null);
+    setIsSubmitting(true);
 
-    // Initial mock login (Phase 1 structure ready for API)
-    setTimeout(() => {
-      login('mock_jwt_token_alex_morgan', {
-        id: 'usr_alex_morgan_001',
-        name: 'Alex Morgan',
-        email: email,
-      });
-      setLoading(false);
-      navigate('/app/dashboard');
-    }, 400);
+    if (!email || !password) {
+      setError('Please fill in both email and password.');
+      setIsSubmitting(false);
+      return;
+    }
+
+    const res = await loginUser(email, password);
+    setIsSubmitting(false);
+
+    if (res.success) {
+      navigate('/app');
+    } else {
+      setError(res.error || 'Login failed. Please check your credentials.');
+    }
   };
 
   return (
@@ -40,12 +47,12 @@ export const LoginPage: React.FC = () => {
       }}
     >
       <Card style={{ maxWidth: '440px', width: '100%', padding: '40px 32px' }}>
-        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+        <div style={{ textAlign: 'center', marginBottom: '28px' }}>
           <div
             style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: '12px',
+              width: '52px',
+              height: '52px',
+              borderRadius: '14px',
               background: 'var(--gradient-brand)',
               display: 'inline-flex',
               alignItems: 'center',
@@ -54,7 +61,7 @@ export const LoginPage: React.FC = () => {
               marginBottom: '16px',
             }}
           >
-            <Network size={28} color="#FFFFFF" />
+            <Network size={30} color="#FFFFFF" />
           </div>
           <h2
             style={{
@@ -72,7 +79,27 @@ export const LoginPage: React.FC = () => {
           </p>
         </div>
 
-        <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        {error && (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              padding: '12px 16px',
+              borderRadius: 'var(--radius-md)',
+              backgroundColor: 'var(--color-error-bg)',
+              border: '1px solid rgba(198, 90, 85, 0.3)',
+              color: 'var(--color-error)',
+              fontSize: '13px',
+              marginBottom: '20px',
+            }}
+          >
+            <AlertCircle size={18} style={{ flexShrink: 0 }} />
+            <span>{error}</span>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           <div>
             <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, marginBottom: '6px' }}>
               Email Address
@@ -82,6 +109,7 @@ export const LoginPage: React.FC = () => {
               <input
                 type="email"
                 required
+                placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 style={{
@@ -91,6 +119,7 @@ export const LoginPage: React.FC = () => {
                   border: '1px solid var(--color-border)',
                   backgroundColor: 'var(--color-warm-cream)',
                   fontSize: '14px',
+                  color: 'var(--color-deep-cocoa)',
                 }}
               />
             </div>
@@ -105,6 +134,7 @@ export const LoginPage: React.FC = () => {
               <input
                 type="password"
                 required
+                placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 style={{
@@ -114,12 +144,13 @@ export const LoginPage: React.FC = () => {
                   border: '1px solid var(--color-border)',
                   backgroundColor: 'var(--color-warm-cream)',
                   fontSize: '14px',
+                  color: 'var(--color-deep-cocoa)',
                 }}
               />
             </div>
           </div>
 
-          <Button type="submit" variant="primary" size="lg" isLoading={loading} icon={<ArrowRight size={18} />}>
+          <Button type="submit" variant="primary" size="lg" isLoading={isSubmitting} icon={<ArrowRight size={18} />}>
             Sign In to Workspace
           </Button>
         </form>

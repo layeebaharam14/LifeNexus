@@ -1,17 +1,18 @@
 import { Router } from 'express';
+import {
+  registerController,
+  loginController,
+  getMeController,
+  logoutController,
+} from '../controllers/authController.js';
 import { authenticateUser } from '../middleware/authMiddleware.js';
 
 export const authRoutes = Router();
 
-// Skeleton auth endpoints (ready for controllers)
-authRoutes.post('/register', async (req, res) => {
-  res.json({ success: true, message: 'Auth register endpoint ready' });
-});
+// Public Authentication Endpoints
+authRoutes.post('/register', registerController);
+authRoutes.post('/login', loginController);
+authRoutes.post('/logout', logoutController);
 
-authRoutes.post('/login', async (req, res) => {
-  res.json({ success: true, message: 'Auth login endpoint ready' });
-});
-
-authRoutes.get('/me', authenticateUser, async (req, res) => {
-  res.json({ success: true, user: req.user });
-});
+// Protected Authentication Endpoints
+authRoutes.get('/me', authenticateUser, getMeController);

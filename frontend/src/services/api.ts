@@ -1,28 +1,78 @@
-import axios from 'axios';
+import { API_BASE_URL } from '../config/apiConfig.js';
+import { ApiResponse } from '../types/index.js';
 
-export const apiClient = axios.create({
-  baseURL: '/api',
-  headers: {
+function getAuthHeaders(): HeadersInit {
+  const headers: HeadersInit = {
     'Content-Type': 'application/json',
-  },
-});
-
-// Attach Authorization Bearer token automatically if present
-apiClient.interceptors.request.use((config) => {
+  };
   const token = localStorage.getItem('lifenexus_token');
-  if (token && config.headers) {
-    config.headers.Authorization = `Bearer ${token}`;
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
   }
-  return config;
-});
+  return headers;
+}
 
-// Handle global response errors (e.g. 401 redirect)
-apiClient.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response && error.response.status === 401) {
-      localStorage.removeItem('lifenexus_token');
+export async function fetchHealth(): Promise<ApiResponse<{ service: string; status: string }>> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/health`);
+    if (!response.ok) {
+      throw new Error(`HTTP Error: ${response.status} ${response.statusText}`);
     }
-    return Promise.reject(error);
+    const data = await response.json();
+    return data;
+  } catch (error: any) {
+    return {
+      success: false,
+      error: error.message || 'Unable to connect to backend server',
+    };
   }
-);
+}
+
+export async function apiGet<T = any>(endpoint: string): Promise<ApiResponse<T>> {
+  try {
+    const url = endpoint.startsWith('http') ? endpoint : `${API_BASE_URL}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      return {
+        success: false,
+        error: data.error || data.message || `Request failed with status ${response.status}`,
+      };
+    }
+    return data;
+  } catch (error: any) {
+    return {
+      success: false,
+      error: error.message || 'Network request failed',
+    };
+  }
+}
+
+export async function apiPost<T = any>(endpoint: string, body?: any): Promise<ApiResponse<T>> {
+  try {
+    const url = endpoint.startsWith('http') ? endpoint : `${API_BASE_URL}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: body ? JSON.stringify(body) : undefined,
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      return {
+        success: false,
+        error: data.error || data.message || `Request failed with status ${response.status}`,
+      };
+    }
+    return data;
+  } catch (error: any) {
+    return {
+      success: false,
+      error: error.message || 'Network request failed',
+    };
+  }
+}

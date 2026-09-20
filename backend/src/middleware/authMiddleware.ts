@@ -1,29 +1,45 @@
 import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
-import { ENV } from '../config/environment.js';
-import { UserTokenPayload } from '../types/api.js';
+import { verifyToken } from '../services/auth/tokenService.js';
+import { ApiResponse } from '../types/api.js';
 
-export function authenticateUser(req: Request, res: Response, next: NextFunction): void {
+export function authenticateUser(
+  req: Request,
+  res: Response<ApiResponse>,
+  next: NextFunction
+): void {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     res.status(401).json({
       success: false,
-      error: 'Authentication required. Please provide a valid Bearer token.',
+      error: 'Authentication required. No token provided.',
     });
     return;
   }
 
-  const token = authHeader.split(' ')[1];
+  const token = authHeader.substring(7).trim();
+  if (!token) {
+    res.status(401).json({
+      success: false,
+      error: 'Authentication token is empty.',
+    });
+    return;
+  }
 
-  try {
-    const decoded = jwt.verify(token, ENV.JWT_SECRET) as UserTokenPayload;
-    req.user = decoded;
-    next();
-  } catch (error) {
+  const payload = verifyToken(token);
+  if (!payload || !payload.userId) {
     res.status(401).json({
       success: false,
       error: 'Invalid or expired authentication token.',
     });
+    return;
   }
+
+  // Attach verified user identity to Request
+  req.user = {
+    userId: payload.userId,
+    email: payload.email,
+  };
+
+  next();
 }

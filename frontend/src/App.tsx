@@ -1,25 +1,51 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext.js';
-import { MainLayout } from './components/layout/MainLayout.js';
 import { LandingPage } from './pages/LandingPage.js';
 import { LoginPage } from './pages/LoginPage.js';
 import { RegisterPage } from './pages/RegisterPage.js';
-import { DashboardPage } from './pages/DashboardPage.js';
-import { ImportPage } from './pages/ImportPage.js';
-import { SearchPage } from './pages/SearchPage.js';
-import { GraphPage } from './pages/GraphPage.js';
-import { TimelinePage } from './pages/TimelinePage.js';
-import { InsightsPage } from './pages/InsightsPage.js';
-import { DocumentsPage } from './pages/DocumentsPage.js';
-import { PrivacyPage } from './pages/PrivacyPage.js';
+import { AuthenticatedWorkspacePage } from './pages/AuthenticatedWorkspacePage.js';
 
-// Protected Route Guard
+// Protected Route Guard for Authenticated Users Only
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div
+        style={{
+          minHeight: '100vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: 'var(--color-warm-cream)',
+          color: 'var(--color-nexus-orange)',
+        }}
+      >
+        <span style={{ fontSize: '15px', fontWeight: 600 }}>Verifying session...</span>
+      </div>
+    );
+  }
+
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
+
+  return <>{children}</>;
+};
+
+// Public Route Guard (Redirects already logged-in users directly to /app)
+const PublicAuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return null;
+  }
+
+  if (isAuthenticated) {
+    return <Navigate to="/app" replace />;
+  }
+
   return <>{children}</>;
 };
 
@@ -28,30 +54,44 @@ export const App: React.FC = () => {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          {/* Public Routes */}
+          {/* Public Landing Page */}
           <Route path="/" element={<LandingPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
 
-          {/* Authenticated Workspace Routes */}
+          {/* Authentication Routes */}
+          <Route
+            path="/login"
+            element={
+              <PublicAuthRoute>
+                <LoginPage />
+              </PublicAuthRoute>
+            }
+          />
+          <Route
+            path="/register"
+            element={
+              <PublicAuthRoute>
+                <RegisterPage />
+              </PublicAuthRoute>
+            }
+          />
+
+          {/* Protected Authenticated Workspace Shell */}
           <Route
             path="/app"
             element={
               <ProtectedRoute>
-                <MainLayout />
+                <AuthenticatedWorkspacePage />
               </ProtectedRoute>
             }
-          >
-            <Route index element={<Navigate to="/app/dashboard" replace />} />
-            <Route path="dashboard" element={<DashboardPage />} />
-            <Route path="import" element={<ImportPage />} />
-            <Route path="search" element={<SearchPage />} />
-            <Route path="graph" element={<GraphPage />} />
-            <Route path="timeline" element={<TimelinePage />} />
-            <Route path="insights" element={<InsightsPage />} />
-            <Route path="documents" element={<DocumentsPage />} />
-            <Route path="privacy" element={<PrivacyPage />} />
-          </Route>
+          />
+          <Route
+            path="/app/*"
+            element={
+              <ProtectedRoute>
+                <AuthenticatedWorkspacePage />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Fallback */}
           <Route path="*" element={<Navigate to="/" replace />} />

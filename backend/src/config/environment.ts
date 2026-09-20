@@ -6,11 +6,10 @@ dotenv.config();
 export const ENV = {
   PORT: process.env.PORT ? parseInt(process.env.PORT, 10) : 5000,
   NODE_ENV: process.env.NODE_ENV || 'development',
-  CLIENT_URL: process.env.CLIENT_URL || 'http://localhost:5173',
+  FRONTEND_URL: process.env.FRONTEND_URL || process.env.CLIENT_URL || 'http://localhost:5173',
   MONGODB_URI: process.env.MONGODB_URI || 'mongodb://localhost:27017/lifenexus',
-  JWT_SECRET: process.env.JWT_SECRET || 'lifenexus_default_dev_jwt_secret_change_me',
+  JWT_SECRET: process.env.JWT_SECRET || 'lifenexus_dev_secret_key_982374823974892374982374',
   JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || '7d',
-  GEMINI_API_KEY: process.env.GEMINI_API_KEY || '',
   UPLOAD_DIR: process.env.UPLOAD_DIR || path.join(process.cwd(), 'uploads'),
   MAX_FILE_SIZE_MB: process.env.MAX_FILE_SIZE_MB ? parseInt(process.env.MAX_FILE_SIZE_MB, 10) : 15,
 };

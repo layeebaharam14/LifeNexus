@@ -1,31 +1,55 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Network, Lock, Mail, User, ArrowRight } from 'lucide-react';
+import { Network, Lock, Mail, User as UserIcon, ArrowRight, AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.js';
 import { Button } from '../components/common/Button.js';
 import { Card } from '../components/common/Card.js';
 
 export const RegisterPage: React.FC = () => {
-  const [name, setName] = useState('Alex Morgan');
-  const [email, setEmail] = useState('alex.morgan@example.com');
-  const [password, setPassword] = useState('password123');
-  const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const { registerUser } = useAuth();
   const navigate = useNavigate();
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setError(null);
 
-    setTimeout(() => {
-      login('mock_jwt_token_alex_morgan', {
-        id: 'usr_alex_morgan_001',
-        name: name,
-        email: email,
-      });
-      setLoading(false);
-      navigate('/app/dashboard');
-    }, 400);
+    // Client-side validation
+    if (!name.trim()) {
+      setError('Please enter your full name.');
+      return;
+    }
+
+    if (!email.trim() || !email.includes('@')) {
+      setError('Please enter a valid email address.');
+      return;
+    }
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters long.');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    const res = await registerUser(name, email, password, confirmPassword);
+    setIsSubmitting(false);
+
+    if (res.success) {
+      navigate('/app');
+    } else {
+      setError(res.error || 'Registration failed. Please try again.');
+    }
   };
 
   return (
@@ -39,13 +63,13 @@ export const RegisterPage: React.FC = () => {
         padding: '24px',
       }}
     >
-      <Card style={{ maxWidth: '440px', width: '100%', padding: '40px 32px' }}>
-        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+      <Card style={{ maxWidth: '460px', width: '100%', padding: '40px 32px' }}>
+        <div style={{ textAlign: 'center', marginBottom: '28px' }}>
           <div
             style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: '12px',
+              width: '52px',
+              height: '52px',
+              borderRadius: '14px',
               background: 'var(--gradient-brand)',
               display: 'inline-flex',
               alignItems: 'center',
@@ -54,7 +78,7 @@ export const RegisterPage: React.FC = () => {
               marginBottom: '16px',
             }}
           >
-            <Network size={28} color="#FFFFFF" />
+            <Network size={30} color="#FFFFFF" />
           </div>
           <h2
             style={{
@@ -72,16 +96,37 @@ export const RegisterPage: React.FC = () => {
           </p>
         </div>
 
-        <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+        {error && (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              padding: '12px 16px',
+              borderRadius: 'var(--radius-md)',
+              backgroundColor: 'var(--color-error-bg)',
+              border: '1px solid rgba(198, 90, 85, 0.3)',
+              color: 'var(--color-error)',
+              fontSize: '13px',
+              marginBottom: '20px',
+            }}
+          >
+            <AlertCircle size={18} style={{ flexShrink: 0 }} />
+            <span>{error}</span>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div>
             <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, marginBottom: '6px' }}>
               Full Name
             </label>
             <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-              <User size={18} color="var(--color-light-brown)" style={{ position: 'absolute', left: '12px' }} />
+              <UserIcon size={18} color="var(--color-light-brown)" style={{ position: 'absolute', left: '12px' }} />
               <input
                 type="text"
                 required
+                placeholder="Alex Morgan"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 style={{
@@ -91,6 +136,7 @@ export const RegisterPage: React.FC = () => {
                   border: '1px solid var(--color-border)',
                   backgroundColor: 'var(--color-warm-cream)',
                   fontSize: '14px',
+                  color: 'var(--color-deep-cocoa)',
                 }}
               />
             </div>
@@ -105,6 +151,7 @@ export const RegisterPage: React.FC = () => {
               <input
                 type="email"
                 required
+                placeholder="alex@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 style={{
@@ -114,6 +161,7 @@ export const RegisterPage: React.FC = () => {
                   border: '1px solid var(--color-border)',
                   backgroundColor: 'var(--color-warm-cream)',
                   fontSize: '14px',
+                  color: 'var(--color-deep-cocoa)',
                 }}
               />
             </div>
@@ -128,6 +176,7 @@ export const RegisterPage: React.FC = () => {
               <input
                 type="password"
                 required
+                placeholder="At least 6 characters"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 style={{
@@ -137,12 +186,38 @@ export const RegisterPage: React.FC = () => {
                   border: '1px solid var(--color-border)',
                   backgroundColor: 'var(--color-warm-cream)',
                   fontSize: '14px',
+                  color: 'var(--color-deep-cocoa)',
                 }}
               />
             </div>
           </div>
 
-          <Button type="submit" variant="primary" size="lg" isLoading={loading} icon={<ArrowRight size={18} />}>
+          <div>
+            <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, marginBottom: '6px' }}>
+              Confirm Password
+            </label>
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+              <Lock size={18} color="var(--color-light-brown)" style={{ position: 'absolute', left: '12px' }} />
+              <input
+                type="password"
+                required
+                placeholder="Repeat password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px 12px 10px 40px',
+                  borderRadius: 'var(--radius-md)',
+                  border: '1px solid var(--color-border)',
+                  backgroundColor: 'var(--color-warm-cream)',
+                  fontSize: '14px',
+                  color: 'var(--color-deep-cocoa)',
+                }}
+              />
+            </div>
+          </div>
+
+          <Button type="submit" variant="primary" size="lg" isLoading={isSubmitting} icon={<ArrowRight size={18} />} style={{ marginTop: '8px' }}>
             Create Private Workspace
           </Button>
         </form>
