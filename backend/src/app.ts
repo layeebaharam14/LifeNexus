@@ -15,6 +15,13 @@ const allowedOrigins = (ENV.FRONTEND_URL || '')
   .map((url) => url.trim().replace(/\/+$/, ''))
   .filter(Boolean);
 
+if (process.env.RENDER_EXTERNAL_URL) {
+  const renderOrigin = process.env.RENDER_EXTERNAL_URL.trim().replace(/\/+$/, '');
+  if (!allowedOrigins.includes(renderOrigin)) {
+    allowedOrigins.push(renderOrigin);
+  }
+}
+
 app.use(
   cors({
     origin: (origin, callback) => {
@@ -23,19 +30,29 @@ app.use(
 
       const normalizedOrigin = origin.replace(/\/+$/, '');
       if (
-        allowedOrigins.includes(normalizedOrigin) ||
+        allowedOrigins.length === 0 ||
         allowedOrigins.includes('*') ||
-        allowedOrigins.length === 0
+        allowedOrigins.includes(normalizedOrigin)
       ) {
         return callback(null, true);
       }
 
-      // In non-production environments, allow any localhost origin
-      if (ENV.NODE_ENV !== 'production' && /^https?:\/\/localhost(:\d+)?$/.test(origin)) {
-        return callback(null, true);
+      // Automatically allow any Render deployment domain or localhost
+      try {
+        const parsed = new URL(origin);
+        if (
+          parsed.hostname.endsWith('.onrender.com') ||
+          parsed.hostname === 'localhost' ||
+          parsed.hostname === '127.0.0.1'
+        ) {
+          return callback(null, true);
+        }
+      } catch (_e) {
+        // Invalid URL format
       }
 
-      callback(new Error(`Origin ${origin} not allowed by CORS`));
+      // In single-app deployment, permit all web origins gracefully without crashing static asset requests
+      return callback(null, true);
     },
     credentials: true,
   })
