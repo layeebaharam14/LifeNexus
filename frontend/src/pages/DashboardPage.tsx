@@ -16,12 +16,14 @@ import { Card } from '../components/common/Card.js';
 import { Button } from '../components/common/Button.js';
 import { Badge } from '../components/common/Badge.js';
 import { getDocuments } from '../services/documentService.js';
+import { getMemoryStats, MemoryStats } from '../services/memoryService.js';
 import { DocumentRecord } from '../types/index.js';
 
 export const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
   const [recentDocs, setRecentDocs] = useState<DocumentRecord[]>([]);
   const [isLoadingDocs, setIsLoadingDocs] = useState<boolean>(true);
+  const [memStats, setMemStats] = useState<MemoryStats>({ memories: 0, entities: 0, relationships: 0, timelineEvents: 0 });
 
   useEffect(() => {
     const fetchRecentDocs = async () => {
@@ -37,7 +39,19 @@ export const DashboardPage: React.FC = () => {
       }
     };
 
+    const fetchMemStats = async () => {
+      try {
+        const res = await getMemoryStats();
+        if (res.success && res.data?.stats) {
+          setMemStats(res.data.stats);
+        }
+      } catch (_err) {
+        // Stats remain zero if unavailable
+      }
+    };
+
     fetchRecentDocs();
+    fetchMemStats();
   }, []);
 
   const formatDate = (dateStr: string): string => {
@@ -142,7 +156,7 @@ export const DashboardPage: React.FC = () => {
             <Network size={20} color="var(--color-nexus-orange)" />
           </div>
           <div style={{ fontSize: '32px', fontWeight: 800, color: 'var(--color-deep-cocoa)' }}>
-            0
+            {memStats.entities}
           </div>
           <p style={{ fontSize: '12px', color: 'var(--color-muted-brown)', marginTop: '4px' }}>
             Entities mapped in Life Graph
@@ -164,7 +178,7 @@ export const DashboardPage: React.FC = () => {
             <Clock size={20} color="var(--color-nexus-orange)" />
           </div>
           <div style={{ fontSize: '32px', fontWeight: 800, color: 'var(--color-deep-cocoa)' }}>
-            0
+            {memStats.timelineEvents}
           </div>
           <p style={{ fontSize: '12px', color: 'var(--color-muted-brown)', marginTop: '4px' }}>
             Chronological events detected
@@ -186,7 +200,7 @@ export const DashboardPage: React.FC = () => {
             <Sparkles size={20} color="var(--color-nexus-orange)" />
           </div>
           <div style={{ fontSize: '32px', fontWeight: 800, color: 'var(--color-deep-cocoa)' }}>
-            0
+            {memStats.relationships}
           </div>
           <p style={{ fontSize: '12px', color: 'var(--color-muted-brown)', marginTop: '4px' }}>
             Cross-document connections

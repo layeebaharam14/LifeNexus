@@ -6,11 +6,16 @@ CORE EXTRACTION RULES:
 1. GROUNDING & PROVENANCE: Analyze ONLY the supplied text. Do NOT assume, fabricate, or extrapolate facts not explicitly mentioned. Every extracted entity, date, amount, event, identifier, and relationship MUST include an exact 'evidence' quote from the document text.
 2. CONFIDENCE SCORES: Assign a numeric confidence score between 0.0 and 1.0 based solely on how unambiguous and direct the textual evidence is.
 3. DOCUMENT CLASSIFICATION: Classify the document into one of: 'invoice', 'receipt', 'warranty', 'repair', 'certificate', 'travel', 'subscription', 'renewal', 'insurance', 'contract', 'note', 'resume', 'medical', 'other'.
-4. ENTITIES: Extract distinct named entities (PERSON, ORGANIZATION, PRODUCT, PLACE, SERVICE, ACCOUNT, CERTIFICATE, OTHER) with normalized forms where helpful.
-5. DATES & TEMPORAL FACTS: Extract all critical dates (PURCHASE, EXPIRY, START, END, EVENT, ISSUE, RENEWAL, DUE, OTHER) in ISO format (YYYY-MM-DD) if available, with date precision ('DAY', 'MONTH', 'YEAR', 'UNKNOWN').
+4. ENTITIES & TYPING: Extract distinct named entities with strict typing:
+   - ORGANIZATION: Companies, retailers, corporate entities, employers, issuers (e.g. "Croma Electronics Retail Ltd.", "Dell Technologies").
+   - PLACE: Physical store branches, addresses, cities, locations, venues, airports (e.g. "Indiranagar, Bangalore, Karnataka - 560038"). Never classify physical addresses or store locations as ORGANIZATION.
+   - PERSON: Human individuals, customers, buyers, passengers (e.g. "Alex Morgan").
+   - PRODUCT: Devices, laptop models, goods, assets (e.g. "ASUS Vivobook 15 OLED (2026 Edition)").
+   - SERVICE / ACCOUNT / CERTIFICATE / OTHER: Explicit non-physical entities.
+5. DATES & TEMPORAL FACTS: Extract all critical dates (PURCHASE, EXPIRY, START, END, EVENT, ISSUE, RENEWAL, DUE, OTHER) in ISO format (YYYY-MM-DD) or normalized string, with date precision ('DAY', 'MONTH', 'YEAR', 'UNKNOWN').
 6. FINANCIAL AMOUNTS: Extract numeric values, currency codes (e.g. INR, USD, EUR), and type ('PURCHASE', 'PAYMENT', 'PREMIUM', 'REFUND', 'TAX', 'OTHER').
-7. EVENTS & MILESTONES: Identify significant episodic moments (e.g., "Purchased ASUS Vivobook 15", "Attended Hackathon 2025", "Renewed Health Shield Policy").
-8. IDENTIFIERS: Extract ground-truth tracking keys (invoice numbers, serial numbers, policy numbers, PNR/booking codes, certificate IDs).
+7. EVENTS & MILESTONES: Identify significant episodic moments (e.g., "Purchased ASUS Vivobook 15", "Renewed Policy").
+8. IDENTIFIERS: Extract ground-truth tracking keys (invoice numbers, serial numbers, GSTIN, policy numbers, PNR/booking codes).
 9. RELATIONSHIPS: Connect extracted entities with explicit predicates ('purchased_from', 'covered_by', 'belongs_to', 'occurred_at', 'issued_by', 'repaired_by', 'related_to', 'signed_by', 'other').
 10. SUMMARY: Provide a concise, factual 1-2 sentence overview of the document's essential record.
 11. EMPTY FIELDS: If information for a category is absent from the text, return an empty array [] or default value. Never fabricate placeholder data.

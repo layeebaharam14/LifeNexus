@@ -24,6 +24,8 @@ import {
   Clock,
   ChevronRight,
   Info,
+  Network,
+  Zap,
 } from 'lucide-react';
 import { Card } from '../components/common/Card.js';
 import { Badge } from '../components/common/Badge.js';
@@ -36,6 +38,7 @@ import {
   getDocumentUnderstanding,
   DocumentContentResult,
 } from '../services/documentService.js';
+import { buildMemoryForDocument, BuildMemoryResult } from '../services/memoryService.js';
 import { DocumentRecord, DocumentUnderstandingRecord } from '../types/index.js';
 
 export const DocumentsPage: React.FC = () => {
@@ -58,6 +61,10 @@ export const DocumentsPage: React.FC = () => {
   const [understandingDocId, setUnderstandingDocId] = useState<string | null>(null);
   const [understandingError, setUnderstandingError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'overview' | 'entities' | 'dates' | 'amounts' | 'events' | 'relationships'>('overview');
+
+  // Phase 4B: Build Memory State
+  const [buildingMemoryDocId, setBuildingMemoryDocId] = useState<string | null>(null);
+  const [memoryResult, setMemoryResult] = useState<{ docName: string; result: BuildMemoryResult } | null>(null);
 
   // Delete State
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -166,6 +173,24 @@ export const DocumentsPage: React.FC = () => {
       alert(err.message || 'Error fetching document understanding.');
     } finally {
       setUnderstandingDocId(null);
+    }
+  };
+
+  // Phase 4B: Build Memory Handler
+  const handleBuildMemory = async (docId: string, docName: string) => {
+    setBuildingMemoryDocId(docId);
+    setMemoryResult(null);
+    try {
+      const res = await buildMemoryForDocument(docId);
+      if (res.success && res.data?.result) {
+        setMemoryResult({ docName, result: res.data.result });
+      } else {
+        alert(res.error || 'Memory construction failed. Make sure AI Understanding has been run first.');
+      }
+    } catch (err: any) {
+      alert(err.message || 'Error building memory for document.');
+    } finally {
+      setBuildingMemoryDocId(null);
     }
   };
 
@@ -443,6 +468,38 @@ export const DocumentsPage: React.FC = () => {
                           </span>
                         </button>
 
+                        {/* Phase 4B: Build Memory Button */}
+                        <button
+                          id={`build-memory-btn-${doc.id}`}
+                          title="Build Memory Records from AI Understanding"
+                          disabled={buildingMemoryDocId === doc.id}
+                          onClick={() => handleBuildMemory(doc.id, doc.originalName)}
+                          style={{
+                            padding: '6px 10px',
+                            backgroundColor: buildingMemoryDocId === doc.id ? '#e8f5e9' : '#EDE7F6',
+                            border: '1px solid #9C27B0',
+                            borderRadius: 'var(--radius-sm)',
+                            cursor: buildingMemoryDocId === doc.id ? 'not-allowed' : 'pointer',
+                            color: '#6A1B9A',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            fontSize: '12px',
+                            fontWeight: 700,
+                            transition: 'all var(--transition-fast)',
+                            opacity: buildingMemoryDocId === doc.id ? 0.7 : 1,
+                          }}
+                        >
+                          <Network
+                            size={14}
+                            className={buildingMemoryDocId === doc.id ? 'animate-spin' : ''}
+                            color="#6A1B9A"
+                          />
+                          <span>
+                            {buildingMemoryDocId === doc.id ? 'Building...' : 'Build Memory'}
+                          </span>
+                        </button>
+
                         <button
                           title="View Extracted Text"
                           onClick={() => handleViewContent(doc.id)}
@@ -491,6 +548,137 @@ export const DocumentsPage: React.FC = () => {
             </table>
           </div>
         </Card>
+      )}
+
+      {/* Phase 4B: Memory Build Result Panel */}
+      {memoryResult && (
+        <div
+          id="memory-result-panel"
+          style={{
+            position: 'fixed',
+            bottom: '32px',
+            right: '32px',
+            zIndex: 2000,
+            maxWidth: '480px',
+            width: '100%',
+            background: 'linear-gradient(135deg, #F3E5F5 0%, #EDE7F6 100%)',
+            border: '1.5px solid #9C27B0',
+            borderRadius: 'var(--radius-lg)',
+            boxShadow: '0 8px 32px rgba(106, 27, 154, 0.2)',
+            padding: '20px 24px',
+            animation: 'slideInUp 0.3s ease-out',
+          }}
+        >
+          {/* Header */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div
+                style={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '50%',
+                  backgroundColor: '#9C27B0',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Network size={18} color="#fff" />
+              </div>
+              <div>
+                <div style={{ fontWeight: 800, fontSize: '15px', color: '#4A148C' }}>
+                  Memory Built!
+                </div>
+                <div style={{ fontSize: '12px', color: '#6A1B9A', opacity: 0.8 }}>
+                  {memoryResult.docName}
+                </div>
+              </div>
+            </div>
+            <button
+              onClick={() => setMemoryResult(null)}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6A1B9A', padding: '2px' }}
+            >
+              <X size={18} />
+            </button>
+          </div>
+
+          {/* Stats Grid */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+            <div style={{
+              background: 'rgba(255,255,255,0.7)',
+              borderRadius: 'var(--radius-md)',
+              padding: '12px 14px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '4px',
+            }}>
+              <div style={{ fontSize: '22px', fontWeight: 800, color: '#4A148C' }}>
+                {memoryResult.result.entitiesCreated + memoryResult.result.entitiesReused}
+              </div>
+              <div style={{ fontSize: '12px', color: '#6A1B9A', fontWeight: 600 }}>
+                Entities ({memoryResult.result.entitiesCreated} new · {memoryResult.result.entitiesReused} reused)
+              </div>
+            </div>
+            <div style={{
+              background: 'rgba(255,255,255,0.7)',
+              borderRadius: 'var(--radius-md)',
+              padding: '12px 14px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '4px',
+            }}>
+              <div style={{ fontSize: '22px', fontWeight: 800, color: '#4A148C' }}>
+                {memoryResult.result.relationshipsCreated}
+              </div>
+              <div style={{ fontSize: '12px', color: '#6A1B9A', fontWeight: 600 }}>Relationships Created</div>
+            </div>
+            <div style={{
+              background: 'rgba(255,255,255,0.7)',
+              borderRadius: 'var(--radius-md)',
+              padding: '12px 14px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '4px',
+            }}>
+              <div style={{ fontSize: '22px', fontWeight: 800, color: '#4A148C' }}>
+                {memoryResult.result.memoriesCreated}
+              </div>
+              <div style={{ fontSize: '12px', color: '#6A1B9A', fontWeight: 600 }}>Memory Records</div>
+            </div>
+            <div style={{
+              background: 'rgba(255,255,255,0.7)',
+              borderRadius: 'var(--radius-md)',
+              padding: '12px 14px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '4px',
+            }}>
+              <div style={{ fontSize: '22px', fontWeight: 800, color: '#4A148C' }}>
+                {memoryResult.result.timelineEventsCreated}
+              </div>
+              <div style={{ fontSize: '12px', color: '#6A1B9A', fontWeight: 600 }}>Timeline Events</div>
+            </div>
+          </div>
+
+          {/* Status */}
+          <div style={{
+            marginTop: '12px',
+            padding: '8px 12px',
+            borderRadius: 'var(--radius-sm)',
+            backgroundColor: memoryResult.result.status === 'SUCCESS' ? '#E8F5E9' : '#FFF3E0',
+            color: memoryResult.result.status === 'SUCCESS' ? '#1B5E20' : '#E65100',
+            fontSize: '12px',
+            fontWeight: 600,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+          }}>
+            <Check size={13} />
+            {memoryResult.result.status === 'SUCCESS'
+              ? 'Memory successfully persisted to the Personal Knowledge Graph.'
+              : 'Memory partially built — some records may be missing.'}
+          </div>
+        </div>
       )}
 
       {/* Extracted Text Content Modal */}

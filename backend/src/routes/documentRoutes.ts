@@ -10,6 +10,7 @@ import {
   understandDocumentController,
   getDocumentUnderstandingController,
 } from '../controllers/documentController.js';
+import { buildMemoryController } from '../controllers/memoryController.js';
 
 export const documentRoutes = Router();
 
@@ -32,7 +33,9 @@ documentRoutes.get('/:id/content', getDocumentContentController);
 documentRoutes.post('/:id/understand', understandDocumentController);
 documentRoutes.get('/:id/understanding', getDocumentUnderstandingController);
 
+// Phase 4B: Build Memory from a document's AI Understanding
+documentRoutes.post('/:id/build-memory', buildMemoryController);
+
 // Delete user's document
 documentRoutes.delete('/:id', deleteDocumentController);
-
 

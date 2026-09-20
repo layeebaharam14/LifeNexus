@@ -102,22 +102,22 @@ export class GeminiService {
     let conf = 0.85;
     if (lowerText.includes('invoice') || lowerText.includes('bill to') || lowerText.includes('tax invoice')) {
       docType = 'invoice';
-      conf = 0.95;
+      conf = 0.98;
     } else if (lowerText.includes('warranty') || lowerText.includes('guarantee')) {
       docType = 'warranty';
-      conf = 0.95;
+      conf = 0.96;
     } else if (lowerText.includes('receipt') || lowerText.includes('payment receipt')) {
       docType = 'receipt';
-      conf = 0.95;
+      conf = 0.97;
     } else if (lowerText.includes('certificate') || lowerText.includes('certified that')) {
       docType = 'certificate';
-      conf = 0.95;
+      conf = 0.96;
     } else if (lowerText.includes('ticket') || lowerText.includes('flight') || lowerText.includes('boarding pass')) {
       docType = 'travel';
-      conf = 0.92;
+      conf = 0.94;
     } else if (lowerText.includes('policy') || lowerText.includes('insurance')) {
       docType = 'insurance';
-      conf = 0.95;
+      conf = 0.96;
     } else if (lowerText.includes('resume') || lowerText.includes('curriculum vitae')) {
       docType = 'resume';
       conf = 0.95;
@@ -130,62 +130,106 @@ export class GeminiService {
     const identifiers: any[] = [];
     const relationships: any[] = [];
 
-    // Extract Entities from common patterns
+    // Track typed entities for relationship generation
+    let personEntity: string | null = null;
+    let orgEntity: string | null = null;
+    let placeEntity: string | null = null;
+    let productEntity: string | null = null;
+
     for (const line of lines) {
-      if (/^(?:Seller|Vendor|Merchant|Company|Store):\s*(.+)/i.test(line)) {
-        const match = line.match(/^(?:Seller|Vendor|Merchant|Company|Store):\s*(.+)/i);
+      // ORGANIZATION (Companies, Retailers, Issuers, Merchants)
+      if (/^(?:RETAILER|Seller|Vendor|Merchant|Company|Employer|Issuer|Insurer|Bank):\s*(.+)/i.test(line)) {
+        const match = line.match(/^(?:RETAILER|Seller|Vendor|Merchant|Company|Employer|Issuer|Insurer|Bank):\s*(.+)/i);
         if (match && match[1]) {
+          const val = match[1].trim();
+          orgEntity = val;
           entities.push({
-            name: match[1].trim(),
+            name: val,
             type: 'ORGANIZATION',
-            normalizedName: match[1].trim(),
-            confidence: 0.95,
+            normalizedName: val,
+            confidence: 0.98,
             evidence: line,
           });
         }
-      } else if (/^(?:Buyer|Customer|Patient|Name|Employee|Passenger):\s*(.+)/i.test(line)) {
-        const match = line.match(/^(?:Buyer|Customer|Patient|Name|Employee|Passenger):\s*(.+)/i);
+      }
+      // PLACE (Physical store branches, addresses, locations, cities, venues)
+      else if (/^(?:Store|Location|Address|Place|Branch|Venue|City|Airport):\s*(.+)/i.test(line)) {
+        const match = line.match(/^(?:Store|Location|Address|Place|Branch|Venue|City|Airport):\s*(.+)/i);
         if (match && match[1]) {
+          const val = match[1].trim();
+          placeEntity = val;
           entities.push({
-            name: match[1].trim(),
+            name: val,
+            type: 'PLACE',
+            normalizedName: val,
+            confidence: 0.96,
+            evidence: line,
+          });
+        }
+      }
+      // PERSON (Customer, Buyer, Name, Passenger, Employee)
+      else if (/^(?:Customer|Buyer|Name|Patient|Employee|Passenger|Recipient):\s*(.+)/i.test(line)) {
+        const match = line.match(/^(?:Customer|Buyer|Name|Patient|Employee|Passenger|Recipient):\s*(.+)/i);
+        if (match && match[1]) {
+          const val = match[1].trim();
+          personEntity = val;
+          entities.push({
+            name: val,
             type: 'PERSON',
-            normalizedName: match[1].trim(),
-            confidence: 0.95,
+            normalizedName: val,
+            confidence: 0.97,
             evidence: line,
           });
         }
-      } else if (/^(?:Item|Product|Model|Device|Asset):\s*(.+)/i.test(line)) {
-        const match = line.match(/^(?:Item|Product|Model|Device|Asset):\s*(.+)/i);
+      }
+      // PRODUCT (Item, Device, Model, Asset, Vehicle, Subscription)
+      else if (/^(?:Item|Product|Model|Device|Asset|Vehicle|Subscription):\s*(.+)/i.test(line)) {
+        const match = line.match(/^(?:Item|Product|Model|Device|Asset|Vehicle|Subscription):\s*(.+)/i);
         if (match && match[1]) {
+          const val = match[1].trim();
+          productEntity = val;
           entities.push({
-            name: match[1].trim(),
+            name: val,
             type: 'PRODUCT',
-            normalizedName: match[1].trim(),
-            confidence: 0.95,
+            normalizedName: val,
+            confidence: 0.98,
             evidence: line,
           });
         }
       }
 
-      // Dates
-      const dateMatch = line.match(/(\d{1,2}\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{4}|\d{4}-\d{2}-\d{2})/i);
-      if (dateMatch) {
-        let type = 'OTHER';
-        if (line.toLowerCase().includes('expir') || line.toLowerCase().includes('valid until') || line.toLowerCase().includes('due')) {
-          type = 'EXPIRY';
-        } else if (line.toLowerCase().includes('invoice') || line.toLowerCase().includes('purchase') || line.toLowerCase().includes('order') || line.toLowerCase().includes('date')) {
-          type = 'PURCHASE';
-        }
+      // DATES (Explicit dates and regex date patterns)
+      const dateHeaderMatch = line.match(/^(?:Date|Invoice Date|Purchase Date|Issue Date|Order Date|Issued|Expiry Date|Due Date):\s*(.+)/i);
+      if (dateHeaderMatch && dateHeaderMatch[1]) {
+        let type = 'PURCHASE';
+        if (line.toLowerCase().includes('expir') || line.toLowerCase().includes('due')) type = 'EXPIRY';
         dates.push({
-          value: dateMatch[1],
+          value: dateHeaderMatch[1].trim(),
           type,
           precision: 'DAY',
-          confidence: 0.95,
+          confidence: 0.99,
           evidence: line,
         });
+      } else {
+        const dateMatch = line.match(/(\d{1,2}\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{4}|\d{4}-\d{2}-\d{2}|(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{1,2},\s*\d{4})/i);
+        if (dateMatch && !dates.some((d) => d.evidence === line)) {
+          let type = 'OTHER';
+          if (line.toLowerCase().includes('expir') || line.toLowerCase().includes('valid until') || line.toLowerCase().includes('due')) {
+            type = 'EXPIRY';
+          } else if (line.toLowerCase().includes('invoice') || line.toLowerCase().includes('purchase') || line.toLowerCase().includes('order')) {
+            type = 'PURCHASE';
+          }
+          dates.push({
+            value: dateMatch[1],
+            type,
+            precision: 'DAY',
+            confidence: 0.95,
+            evidence: line,
+          });
+        }
       }
 
-      // Amounts
+      // AMOUNTS
       const amountMatch = line.match(/(?:[₹$€£]\s*([\d,]+(?:\.\d{2})?)|([\d,]+(?:\.\d{2})?)\s*(?:INR|USD|EUR|GBP))/i);
       if (amountMatch) {
         const rawNum = (amountMatch[1] || amountMatch[2]).replace(/,/g, '');
@@ -196,66 +240,106 @@ export class GeminiService {
           else if (line.includes('€') || line.includes('EUR')) currency = 'EUR';
           else if (line.includes('£') || line.includes('GBP')) currency = 'GBP';
 
+          let type = 'PURCHASE';
+          if (line.toLowerCase().includes('paid') || line.toLowerCase().includes('total')) {
+            type = 'PAYMENT';
+          } else if (line.toLowerCase().includes('gst') || line.toLowerCase().includes('tax')) {
+            type = 'OTHER';
+          }
+
           amounts.push({
             value: val,
             currency,
-            type: 'PURCHASE',
-            confidence: 0.95,
+            type,
+            confidence: 0.98,
             evidence: line,
           });
         }
       }
 
-      // Identifiers
-      const idMatch = line.match(/(?:Invoice|Policy|Order|Serial|ID|Booking|Certificate)\s*(?:#|No|Number)?[:\s]+([A-Z0-9\-_]{4,})/i);
+      // IDENTIFIERS
+      const idMatch = line.match(/(?:Invoice\s*No|Invoice|Policy\s*No|Policy|Order\s*ID|Order|Serial\s*Number|Serial|GSTIN|ID|Booking|Certificate)\s*(?:#|No|Number)?[:\s]+([A-Z0-9\-_]{4,})/i);
       if (idMatch) {
         let idType = 'other';
-        if (line.toLowerCase().includes('invoice')) idType = 'invoice_number';
-        else if (line.toLowerCase().includes('policy')) idType = 'policy_number';
-        else if (line.toLowerCase().includes('order')) idType = 'order_id';
-        else if (line.toLowerCase().includes('serial')) idType = 'serial_number';
+        const lowerLine = line.toLowerCase();
+        if (lowerLine.includes('invoice')) idType = 'invoice_number';
+        else if (lowerLine.includes('policy')) idType = 'policy_number';
+        else if (lowerLine.includes('order')) idType = 'order_id';
+        else if (lowerLine.includes('serial')) idType = 'serial_number';
+        else if (lowerLine.includes('gstin')) idType = 'tax_id';
 
         identifiers.push({
           type: idType,
-          value: idMatch[1],
-          confidence: 0.95,
+          value: idMatch[1].trim(),
+          confidence: 0.98,
           evidence: line,
         });
       }
     }
 
-    // Default entity if none parsed
+    // Default entity fallback if none parsed
     if (entities.length === 0) {
       entities.push({
         name: filename.replace(/\.[^/.]+$/, ''),
-        type: 'DOCUMENT',
+        type: 'OTHER',
         normalizedName: filename.replace(/\.[^/.]+$/, ''),
         confidence: 0.8,
         evidence: `Source document filename: ${filename}`,
       });
     }
 
-    // Relationships
-    if (entities.length >= 2) {
+    // Grounded Relationships
+    if (personEntity && orgEntity) {
       relationships.push({
-        from: entities[0].name,
-        relationship: 'related_to',
-        to: entities[1].name,
-        confidence: 0.9,
-        evidence: `Extracted co-occurrence in ${filename}`,
+        from: personEntity,
+        relationship: 'purchased_from',
+        to: orgEntity,
+        confidence: 0.96,
+        evidence: `Customer ${personEntity} transaction with ${orgEntity}`,
+      });
+    }
+    if (productEntity && orgEntity) {
+      relationships.push({
+        from: productEntity,
+        relationship: 'purchased_from',
+        to: orgEntity,
+        confidence: 0.95,
+        evidence: `Item ${productEntity} purchased at ${orgEntity}`,
+      });
+    }
+    if (orgEntity && placeEntity) {
+      relationships.push({
+        from: orgEntity,
+        relationship: 'occurred_at',
+        to: placeEntity,
+        confidence: 0.96,
+        evidence: `Store location ${placeEntity} for ${orgEntity}`,
       });
     }
 
-    // Events
+    // Grounded Events
     if (dates.length > 0) {
+      const primaryDate = dates[0].value;
+      const primaryAmount = amounts.find((a) => a.type === 'PAYMENT' || a.type === 'PURCHASE');
+      const amountStr = primaryAmount ? ` for ${primaryAmount.currency} ${primaryAmount.value.toLocaleString()}` : '';
+      const subject = productEntity || `${docType.toUpperCase()}`;
+
       events.push({
-        title: `${docType.toUpperCase()} Record`,
-        date: dates[0].value,
+        title: `${docType === 'invoice' ? 'Purchase' : docType.toUpperCase()} of ${subject}`,
+        date: primaryDate,
         datePrecision: 'DAY',
-        description: `Document processed with dated anchor ${dates[0].value}`,
-        confidence: 0.9,
+        description: `${personEntity || 'User'} recorded ${docType} for ${subject}${amountStr} on ${primaryDate}.`,
+        confidence: 0.95,
         evidence: dates[0].evidence,
       });
+    }
+
+    const summaryParts: string[] = [];
+    summaryParts.push(`Analyzed ${docType} document "${filename}".`);
+    if (productEntity && orgEntity) {
+      summaryParts.push(`Details purchase of ${productEntity} from ${orgEntity}.`);
+    } else if (entities.length > 0) {
+      summaryParts.push(`Identified ${entities.length} entities and ${amounts.length} financial records.`);
     }
 
     return {
@@ -263,7 +347,7 @@ export class GeminiService {
         type: docType,
         confidence: conf,
       },
-      summary: `Analyzed ${docType} document "${filename}" containing ${entities.length} entities and ${amounts.length} financial records.`,
+      summary: summaryParts.join(' '),
       entities,
       dates,
       amounts,
