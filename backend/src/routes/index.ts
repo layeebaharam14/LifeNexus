@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import { authRoutes } from './authRoutes.js';
 import { documentRoutes } from './documentRoutes.js';
 import { memoryRoutes } from './memoryRoutes.js';
+import { searchRoutes } from './searchRoutes.js';
 import { ApiResponse } from '../types/api.js';
 
 export const apiRouter = Router();
@@ -26,4 +27,7 @@ apiRouter.use('/documents', documentRoutes);
 
 // Memory Routes (Phase 4B)
 apiRouter.use('/memory', memoryRoutes);
+
+// Life Search Routes (Phase 5)
+apiRouter.use('/search', searchRoutes);
 

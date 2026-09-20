@@ -358,6 +358,48 @@ export async function getUserDocumentContent(
   }
 }
 
+export async function getAllUserDocumentsWithContent(
+  userId: string
+): Promise<Array<ProcessedDocumentDTO & { extractedText: string }>> {
+  if (isDbConnected()) {
+    const docs = await DocumentModel.find({ userId });
+    return docs.map((doc) => ({
+      id: doc._id.toString(),
+      userId: doc.userId,
+      fileName: doc.fileName,
+      originalName: doc.originalName,
+      mimeType: doc.mimeType,
+      fileSize: doc.fileSize,
+      fileHash: doc.fileHash,
+      documentType: doc.documentType,
+      processingStatus: doc.processingStatus,
+      hasExtractedText: !!doc.extractedText && doc.extractedText.length > 0,
+      extractedText: doc.extractedText || '',
+      uploadedAt: doc.uploadedAt.toISOString(),
+    }));
+  } else {
+    const list: Array<ProcessedDocumentDTO & { extractedText: string }> = [];
+    for (const doc of inMemoryDocuments.values()) {
+      if (doc.userId === userId) {
+        list.push({
+          id: doc.id,
+          userId: doc.userId,
+          fileName: doc.fileName,
+          originalName: doc.originalName,
+          mimeType: doc.mimeType,
+          fileSize: doc.fileSize,
+          fileHash: doc.fileHash,
+          documentType: doc.documentType,
+          processingStatus: doc.processingStatus,
+          hasExtractedText: !!doc.extractedText && doc.extractedText.length > 0,
+          extractedText: doc.extractedText || '',
+          uploadedAt: doc.uploadedAt.toISOString(),
+        });
+      }
+    }
+    return list;
+  }
+}
 
 export async function deleteUserDocument(
   userId: string,

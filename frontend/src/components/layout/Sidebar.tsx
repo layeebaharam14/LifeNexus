@@ -13,16 +13,16 @@ import {
 
 const ACTIVE_NAV_ITEMS = [
   { name: 'Overview', path: '/app/dashboard', icon: LayoutDashboard },
-  { name: 'Import Documents', path: '/app/import', icon: UploadCloud },
+  { name: 'Life Search', path: '/app/search', icon: Search },
+  { name: 'Life Timeline', path: '/app/timeline', icon: Clock },
+  { name: 'Life Graph', path: '/app/graph', icon: Network },
   { name: 'Documents', path: '/app/documents', icon: FileText },
+  { name: 'Import Documents', path: '/app/import', icon: UploadCloud },
   { name: 'Privacy Sandbox', path: '/app/privacy', icon: ShieldCheck },
 ];
 
 const UPCOMING_NAV_ITEMS = [
-  { name: 'Life Search', path: '/app/search', icon: Search, badge: 'Phase 4' },
-  { name: 'Life Graph', path: '/app/graph', icon: Network, badge: 'Phase 4' },
-  { name: 'Life Timeline', path: '/app/timeline', icon: Clock, badge: 'Phase 4' },
-  { name: 'Life Insights', path: '/app/insights', icon: Lightbulb, badge: 'Phase 4' },
+  { name: 'Life Insights', path: '/app/insights', icon: Lightbulb, badge: 'Phase 7' },
 ];
 
 

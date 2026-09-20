@@ -9,6 +9,9 @@ import { DashboardPage } from './pages/DashboardPage.js';
 import { ImportPage } from './pages/ImportPage.js';
 import { DocumentsPage } from './pages/DocumentsPage.js';
 import { PrivacyPage } from './pages/PrivacyPage.js';
+import { GraphPage } from './pages/GraphPage.js';
+import { SearchPage } from './pages/SearchPage.js';
+import { TimelinePage } from './pages/TimelinePage.js';
 import { AuthenticatedWorkspacePage } from './pages/AuthenticatedWorkspacePage.js';
 
 // Protected Route Guard for Authenticated Users Only
@@ -93,6 +96,9 @@ export const App: React.FC = () => {
             <Route path="dashboard" element={<DashboardPage />} />
             <Route path="import" element={<ImportPage />} />
             <Route path="documents" element={<DocumentsPage />} />
+            <Route path="graph" element={<GraphPage />} />
+            <Route path="search" element={<SearchPage />} />
+            <Route path="timeline" element={<TimelinePage />} />
             <Route path="privacy" element={<PrivacyPage />} />
             <Route path="profile" element={<AuthenticatedWorkspacePage />} />
             <Route path="*" element={<Navigate to="/app/dashboard" replace />} />

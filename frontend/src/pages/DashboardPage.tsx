@@ -141,7 +141,10 @@ export const DashboardPage: React.FC = () => {
           gap: '20px',
         }}
       >
-        <Card>
+        <Card
+          onClick={() => navigate('/app/graph')}
+          style={{ cursor: 'pointer', transition: 'transform 0.15s ease' }}
+        >
           <div
             style={{
               display: 'flex',
@@ -158,12 +161,15 @@ export const DashboardPage: React.FC = () => {
           <div style={{ fontSize: '32px', fontWeight: 800, color: 'var(--color-deep-cocoa)' }}>
             {memStats.entities}
           </div>
-          <p style={{ fontSize: '12px', color: 'var(--color-muted-brown)', marginTop: '4px' }}>
-            Entities mapped in Life Graph
+          <p style={{ fontSize: '12px', color: 'var(--color-nexus-orange)', marginTop: '4px', fontWeight: 500 }}>
+            View Life Graph &rarr;
           </p>
         </Card>
 
-        <Card>
+        <Card
+          onClick={() => navigate('/app/timeline')}
+          style={{ cursor: 'pointer', transition: 'transform 0.15s ease' }}
+        >
           <div
             style={{
               display: 'flex',
@@ -180,8 +186,8 @@ export const DashboardPage: React.FC = () => {
           <div style={{ fontSize: '32px', fontWeight: 800, color: 'var(--color-deep-cocoa)' }}>
             {memStats.timelineEvents}
           </div>
-          <p style={{ fontSize: '12px', color: 'var(--color-muted-brown)', marginTop: '4px' }}>
-            Chronological events detected
+          <p style={{ fontSize: '12px', color: 'var(--color-nexus-orange)', marginTop: '4px', fontWeight: 500 }}>
+            View Life Timeline &rarr;
           </p>
         </Card>
 
