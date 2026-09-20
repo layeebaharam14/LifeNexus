@@ -1,0 +1,22 @@
+{
+  "name": "lifenexus",
+  "version": "1.0.0",
+  "private": true,
+  "description": "LIFENEXUS — Personal Knowledge Graph & Memory Engine",
+  "scripts": {
+    "build:frontend": "npm run build --prefix frontend",
+    "build:backend": "npm run build --prefix backend",
+    "build": "npm run build:frontend && npm run build:backend",
+    "start": "npm start --prefix backend",
+    "dev:backend": "npm run dev --prefix backend",
+    "dev:frontend": "npm run dev --prefix frontend"
+  },
+  "keywords": [
+    "lifenexus",
+    "personal-knowledge-graph",
+    "memory-engine",
+    "ai"
+  ],
+  "author": "LIFENEXUS Team",
+  "license": "MIT"
+}

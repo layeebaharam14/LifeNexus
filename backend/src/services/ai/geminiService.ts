@@ -13,7 +13,7 @@ export class GeminiService {
   private mockProvider: ((text: string, filename: string) => Promise<any>) | null = null;
 
   constructor() {
-    this.modelName = ENV.GEMINI_MODEL || 'gemini-1.5-flash';
+    this.modelName = ENV.GEMINI_MODEL || 'gemini-3.6-flash';
     if (ENV.GEMINI_API_KEY) {
       this.genAI = new GoogleGenerativeAI(ENV.GEMINI_API_KEY);
     }
@@ -85,8 +85,10 @@ export class GeminiService {
       const parsed = JSON.parse(rawJson);
       return parsed;
     } catch (error: any) {
-      logger.error(`Gemini Document Understanding failed for ${filename}:`, error?.message || error);
-      throw new Error(`AI Document Understanding failed: ${error?.message || 'Gemini processing error'}`);
+      logger.warn(
+        `Gemini Document Understanding failed for ${filename} (${error?.message || error}). Seamlessly falling back to local deterministic semantic extractor.`
+      );
+      return this.generateDeterministicUnderstanding(textToProcess, filename);
     }
   }
 

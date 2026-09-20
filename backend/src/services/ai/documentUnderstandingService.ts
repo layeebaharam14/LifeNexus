@@ -117,7 +117,7 @@ export async function understandUserDocument(
   }
 
   // 4. Call Gemini semantic understanding
-  const modelName = ENV.GEMINI_MODEL || 'gemini-1.5-flash';
+  const modelName = ENV.GEMINI_MODEL || 'gemini-3.6-flash';
   let rawAiResult: any = null;
 
   try {

@@ -83,6 +83,12 @@ Instead of acting as a naive document chatbot, LIFENEXUS is powered by a **Perso
 
 ---
 
+## 🌐 Production Deployment
+
+For complete production deployment instructions on **Vercel** (Frontend), **Render** (Backend), and **MongoDB Atlas** (Database), please see the [Production Deployment Guide](Docs/DEPLOYMENT.md).
+
+---
+
 ## 🔒 Privacy & Data Sovereignty
 
 LIFENEXUS is built with strict multi-tenant user isolation. Every record and file is cryptographically isolated by `userId`. Users maintain complete ownership with instant workspace purge capabilities.

@@ -1,4 +1,12 @@
-export const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
+const configuredUrl = (import.meta.env.VITE_API_URL || '').trim().replace(/\/+$/, '');
+
+// If unset, use the relative '/api' proxy path (Vite dev server)
+// If set to full URL (e.g. 'https://lifenexus-backend.onrender.com'), ensure it ends with '/api'
+export const API_BASE_URL = !configuredUrl
+  ? '/api'
+  : configuredUrl.endsWith('/api')
+  ? configuredUrl
+  : `${configuredUrl}/api`;
 
 export const ENDPOINTS = {
   AUTH: {
