@@ -81,6 +81,7 @@ export const IdentifierFactSchema = z.object({
     'order_id',
     'serial_number',
     'account_number',
+    'tax_id',
     'other',
   ]).default('other'),
   value: z.string().min(1),

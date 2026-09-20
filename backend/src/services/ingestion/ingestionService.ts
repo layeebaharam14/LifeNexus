@@ -405,6 +405,7 @@ export async function deleteUserDocument(
   userId: string,
   documentId: string
 ): Promise<boolean> {
+  let deleted = false;
   if (isDbConnected()) {
     if (!mongoose.Types.ObjectId.isValid(documentId)) {
       return false;
@@ -417,17 +418,65 @@ export async function deleteUserDocument(
 
     // Delete DB record
     await DocumentModel.deleteOne({ _id: documentId, userId });
-    return true;
+    deleted = true;
   } else {
     const doc = inMemoryDocuments.get(documentId);
     if (doc && doc.userId === userId) {
       await storageService.deleteFile(doc.storagePath);
       inMemoryDocuments.delete(documentId);
-      return true;
+      deleted = true;
     }
-    return false;
   }
+
+  if (deleted) {
+    // Phase 11 Cascade Integrity: Delete understanding and unlink/purge dependent memory records
+    try {
+      const { deleteDocumentUnderstanding } = await import('../ai/documentUnderstandingService.js');
+      await deleteDocumentUnderstanding(userId, documentId);
+    } catch (err) {
+      logger.warn(`Failed to clean up document understanding for ${documentId}:`, err);
+    }
+
+    try {
+      const { unlinkDocumentFromMemory } = await import('../memory/memoryEngineService.js');
+      await unlinkDocumentFromMemory(userId, documentId);
+    } catch (err) {
+      logger.warn(`Failed to unlink document from memory for ${documentId}:`, err);
+    }
+  }
+
+  return deleted;
 }
+
+export async function clearAllUserDocuments(userId: string): Promise<number> {
+  let count = 0;
+  if (isDbConnected()) {
+    const docs = await DocumentModel.find({ userId });
+    count = docs.length;
+    for (const doc of docs) {
+      try {
+        await storageService.deleteFile(doc.storagePath);
+      } catch (err) {
+        logger.warn(`Failed to delete physical file ${doc.storagePath}:`, err);
+      }
+    }
+    await DocumentModel.deleteMany({ userId });
+  } else {
+    for (const [id, doc] of inMemoryDocuments.entries()) {
+      if (doc.userId === userId) {
+        count++;
+        try {
+          await storageService.deleteFile(doc.storagePath);
+        } catch (err) {
+          logger.warn(`Failed to delete physical file ${doc.storagePath}:`, err);
+        }
+        inMemoryDocuments.delete(id);
+      }
+    }
+  }
+  return count;
+}
+
 
 function determineDocumentType(filename: string, mimeType: string): string {
   const lower = filename.toLowerCase();

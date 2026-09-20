@@ -1,22 +1,21 @@
 import { Router } from 'express';
 import { authenticateUser } from '../middleware/authMiddleware.js';
+import {
+  getPrivacyStatsController,
+  exportWorkspaceController,
+  purgeWorkspaceController,
+} from '../controllers/privacyController.js';
 
 export const privacyRoutes = Router();
+
+// All privacy endpoints require authentication
 privacyRoutes.use(authenticateUser);
 
-privacyRoutes.get('/stats', async (_req, res) => {
-  res.json({
-    success: true,
-    totalDocs: 0,
-    totalEntities: 0,
-    totalEdges: 0,
-    totalEvents: 0,
-  });
-});
+// GET /api/privacy/stats — Live storage & knowledge record breakdown
+privacyRoutes.get('/stats', getPrivacyStatsController);
 
-privacyRoutes.post('/purge', async (_req, res) => {
-  res.json({
-    success: true,
-    message: 'Workspace data successfully purged.',
-  });
-});
+// GET /api/privacy/export — User-scoped JSON export of documents & memory engine
+privacyRoutes.get('/export', exportWorkspaceController);
+
+// POST /api/privacy/purge — Permanent user workspace data purge
+privacyRoutes.post('/purge', purgeWorkspaceController);

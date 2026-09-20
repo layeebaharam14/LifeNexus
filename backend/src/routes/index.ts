@@ -4,6 +4,7 @@ import { documentRoutes } from './documentRoutes.js';
 import { memoryRoutes } from './memoryRoutes.js';
 import { searchRoutes } from './searchRoutes.js';
 import { insightsRoutes } from './insightsRoutes.js';
+import { privacyRoutes } from './privacyRoutes.js';
 import { ApiResponse } from '../types/api.js';
 
 export const apiRouter = Router();
@@ -34,4 +35,7 @@ apiRouter.use('/search', searchRoutes);
 
 // Life Insights Routes (Phase 7)
 apiRouter.use('/insights', insightsRoutes);
+
+// Privacy & Data Sovereignty Routes (Phase 11)
+apiRouter.use('/privacy', privacyRoutes);
 

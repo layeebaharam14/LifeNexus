@@ -320,3 +320,31 @@ function formatMemoryUnderstandingDTO(
   };
 }
 
+export async function deleteDocumentUnderstanding(
+  userId: string,
+  documentId: string
+): Promise<void> {
+  if (isDbConnected()) {
+    await DocumentUnderstandingModel.deleteMany({ userId, documentId });
+  } else {
+    inMemoryUnderstandings.delete(`${userId}_${documentId}`);
+  }
+}
+
+export async function clearAllUserUnderstandings(userId: string): Promise<number> {
+  let count = 0;
+  if (isDbConnected()) {
+    const res = await DocumentUnderstandingModel.deleteMany({ userId });
+    count = res.deletedCount || 0;
+  } else {
+    for (const [key, val] of inMemoryUnderstandings.entries()) {
+      if (val.userId === userId) {
+        inMemoryUnderstandings.delete(key);
+        count++;
+      }
+    }
+  }
+  return count;
+}
+
+

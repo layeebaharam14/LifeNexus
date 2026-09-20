@@ -546,3 +546,184 @@ function mapAiTypeToEntityType(aiType: string): string {
   const map: Record<string, string> = { PERSON: 'Person', ORGANIZATION: 'Organization', PRODUCT: 'Asset', PLACE: 'Location', SERVICE: 'Financial', ACCOUNT: 'Financial', CERTIFICATE: 'Certificate', OTHER: 'Document' };
   return map[aiType?.toUpperCase()] ?? 'Document';
 }
+
+// ------------------------------------------------------------------ //
+// Public: Unlink a specific document from memory (Cascade Integrity)
+// ------------------------------------------------------------------ //
+
+export async function unlinkDocumentFromMemory(userId: string, documentId: string): Promise<void> {
+  if (isDbConnected()) {
+    const { EntityModel } = await import('../../models/Entity.js');
+    const { RelationshipModel } = await import('../../models/Relationship.js');
+    const { MemoryModel } = await import('../../models/Memory.js');
+    const { TimelineEventModel } = await import('../../models/TimelineEvent.js');
+
+    const userObjectId = new mongoose.Types.ObjectId(userId);
+    const docObjectId = mongoose.Types.ObjectId.isValid(documentId)
+      ? new mongoose.Types.ObjectId(documentId)
+      : null;
+
+    if (!docObjectId) return;
+
+    // 1. Pull documentId from Entity sourceDocIds
+    await EntityModel.updateMany(
+      { userId: userObjectId, sourceDocIds: docObjectId },
+      { $pull: { sourceDocIds: docObjectId } }
+    );
+
+    // 2. Identify and delete orphaned entities that have no remaining source documents
+    const orphanedEntities = await EntityModel.find({
+      userId: userObjectId,
+      sourceDocIds: { $size: 0 },
+    }).lean();
+
+    const orphanedEntityIds = orphanedEntities.map((e) => e._id);
+    if (orphanedEntityIds.length > 0) {
+      await EntityModel.deleteMany({ _id: { $in: orphanedEntityIds } });
+    }
+
+    // 3. Pull documentId from Relationship sourceDocIds
+    await RelationshipModel.updateMany(
+      { userId: userObjectId, sourceDocIds: docObjectId },
+      { $pull: { sourceDocIds: docObjectId } }
+    );
+
+    // 4. Delete relationships that have no source docs OR link to deleted entities
+    const relOrFilter: any[] = [{ sourceDocIds: { $size: 0 } }];
+    if (orphanedEntityIds.length > 0) {
+      relOrFilter.push(
+        { sourceEntityId: { $in: orphanedEntityIds } },
+        { targetEntityId: { $in: orphanedEntityIds } }
+      );
+    }
+    await RelationshipModel.deleteMany({
+      userId: userObjectId,
+      $or: relOrFilter,
+    });
+
+    // 5. Pull documentId from Memory records & remove orphaned memories
+    await MemoryModel.updateMany(
+      { userId: userObjectId, sourceDocIds: docObjectId },
+      { $pull: { sourceDocIds: docObjectId } }
+    );
+    await MemoryModel.deleteMany({
+      userId: userObjectId,
+      sourceDocIds: { $size: 0 },
+    });
+
+    // 6. Pull documentId from TimelineEvent records & remove orphaned events
+    await TimelineEventModel.updateMany(
+      { userId: userObjectId, sourceDocIds: docObjectId },
+      { $pull: { sourceDocIds: docObjectId } }
+    );
+    await TimelineEventModel.deleteMany({
+      userId: userObjectId,
+      sourceDocIds: { $size: 0 },
+    });
+
+    logger.info(`Unlinked document ${documentId} from memory for user ${userId}.`);
+  } else {
+    // In-memory fallback cascade
+    const deletedEntityIds = new Set<string>();
+
+    for (let i = inMemEntities.length - 1; i >= 0; i--) {
+      const e = inMemEntities[i];
+      if (e.userId === userId) {
+        e.sourceDocIds = e.sourceDocIds.filter((id) => id !== documentId);
+        if (e.sourceDocIds.length === 0) {
+          deletedEntityIds.add(e.id);
+          inMemEntities.splice(i, 1);
+        }
+      }
+    }
+
+    for (let i = inMemRelationships.length - 1; i >= 0; i--) {
+      const r = inMemRelationships[i];
+      if (r.userId === userId) {
+        r.sourceDocIds = r.sourceDocIds.filter((id) => id !== documentId);
+        if (
+          r.sourceDocIds.length === 0 ||
+          deletedEntityIds.has(r.sourceEntityId) ||
+          deletedEntityIds.has(r.targetEntityId)
+        ) {
+          inMemRelationships.splice(i, 1);
+        }
+      }
+    }
+
+    for (let i = inMemMemories.length - 1; i >= 0; i--) {
+      const m = inMemMemories[i];
+      if (m.userId === userId) {
+        m.sourceDocIds = m.sourceDocIds.filter((id) => id !== documentId);
+        if (m.sourceDocIds.length === 0) {
+          inMemMemories.splice(i, 1);
+        }
+      }
+    }
+
+    for (let i = inMemTimeline.length - 1; i >= 0; i--) {
+      const te = inMemTimeline[i];
+      if (te.userId === userId) {
+        te.sourceDocIds = te.sourceDocIds.filter((id) => id !== documentId);
+        if (te.sourceDocIds.length === 0) {
+          inMemTimeline.splice(i, 1);
+        }
+      }
+    }
+  }
+}
+
+// ------------------------------------------------------------------ //
+// Public: Clear all memory records for a user (Workspace Purge)
+// ------------------------------------------------------------------ //
+
+export async function clearAllUserMemory(userId: string): Promise<number> {
+  let count = 0;
+  if (isDbConnected()) {
+    const { EntityModel } = await import('../../models/Entity.js');
+    const { RelationshipModel } = await import('../../models/Relationship.js');
+    const { MemoryModel } = await import('../../models/Memory.js');
+    const { TimelineEventModel } = await import('../../models/TimelineEvent.js');
+
+    const userObjectId = new mongoose.Types.ObjectId(userId);
+    const [eRes, rRes, mRes, tRes] = await Promise.all([
+      EntityModel.deleteMany({ userId: userObjectId }),
+      RelationshipModel.deleteMany({ userId: userObjectId }),
+      MemoryModel.deleteMany({ userId: userObjectId }),
+      TimelineEventModel.deleteMany({ userId: userObjectId }),
+    ]);
+
+    count =
+      (eRes.deletedCount || 0) +
+      (rRes.deletedCount || 0) +
+      (mRes.deletedCount || 0) +
+      (tRes.deletedCount || 0);
+  } else {
+    for (let i = inMemEntities.length - 1; i >= 0; i--) {
+      if (inMemEntities[i].userId === userId) {
+        inMemEntities.splice(i, 1);
+        count++;
+      }
+    }
+    for (let i = inMemRelationships.length - 1; i >= 0; i--) {
+      if (inMemRelationships[i].userId === userId) {
+        inMemRelationships.splice(i, 1);
+        count++;
+      }
+    }
+    for (let i = inMemMemories.length - 1; i >= 0; i--) {
+      if (inMemMemories[i].userId === userId) {
+        inMemMemories.splice(i, 1);
+        count++;
+      }
+    }
+    for (let i = inMemTimeline.length - 1; i >= 0; i--) {
+      if (inMemTimeline[i].userId === userId) {
+        inMemTimeline.splice(i, 1);
+        count++;
+      }
+    }
+  }
+  return count;
+}
+
