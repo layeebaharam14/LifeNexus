@@ -1,0 +1,38 @@
+FROM: support@f1services.in (F1 Info Solutions & Services - Asus Authorized Service Center)
+TO: alex.morgan@example.com (Alex Morgan)
+DATE: July 24, 2026
+SUBJECT: Service Completed: Your ASUS Vivobook 15 OLED is Ready for Pickup [SR-ASUS-2026-0741]
+
+SERVICE UPDATE & COMPLETION EMAIL
+------------------------------------------------------------
+Company: F1 Info Solutions & Services
+Branch: Indiranagar, Bangalore, Karnataka - 560038
+Customer Care: 1800-209-0365
+
+Customer: Alex Morgan
+Email: alex.morgan@example.com
+Phone: +91 98765 43210
+
+SERVICE DETAILS:
+------------------------------------------------------------
+Service Receipt No: SR-ASUS-2026-0741
+Device: ASUS Vivobook 15 OLED
+Serial Number: NX8821-ASUS-2026
+Warranty Certificate: APC-2026-991827
+Technician: Rajesh Kumar (Badge #TK-402)
+
+Status: COMPLETED & QUALITY TESTED
+Issue Resolved: Flickering display issue resolved. Replaced internal EDP Display Cable and updated BIOS display firmware.
+Diagnostics: 24-hour display burn-in test passed. Thermal performance certified.
+
+BILLING & PICKUP:
+------------------------------------------------------------
+Total Amount: ₹0.00
+Coverage: 100% Free under Asus Premium Care Extended Warranty.
+Pickup Location: F1 Info Solutions & Services, 100ft Road, Indiranagar, Bangalore - 560038
+Working Hours: Monday to Saturday, 10:00 AM - 7:00 PM
+
+Please bring your original service job sheet (SR-ASUS-2026-0741) and government photo ID during pickup.
+
+Thank you for choosing Asus Authorized Service.
+------------------------------------------------------------

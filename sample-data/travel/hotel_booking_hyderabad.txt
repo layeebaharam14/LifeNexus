@@ -1,0 +1,35 @@
+LEMON TREE PREMIER - HITEC CITY HYDERABAD
+RESERVATION CONFIRMATION & INVOICE
+------------------------------------------------------------
+Booking ID: HTL-HYD-2025-9821
+Confirmation Date: December 10, 2025
+Company: Lemon Tree Hotels Ltd.
+Venue: Plot No. 2, Survey No. 64, HITEC City, Madhapur, Hyderabad, Telangana - 500081
+Contact: +91 40 4421 2121 / reservations@lemontreehotels.com
+
+GUEST DETAILS:
+------------------------------------------------------------
+Guest Name: Alex Morgan
+Email: alex.morgan@example.com
+Phone: +91 98765 43210
+Total Guests: 1 Adult
+
+STAY ITINERARY:
+------------------------------------------------------------
+Check-in Date: December 13, 2025 (02:00 PM)
+Check-out Date: December 15, 2025 (12:00 PM)
+Total Nights: 2 Nights
+Room Type: Deluxe King Room (High Floor)
+Purpose of Visit: Attending HACKDAY 2025 Hackathon at Tech Park Convention Center
+
+PAYMENT SUMMARY:
+------------------------------------------------------------
+Room Tariff (2 Nights @ ₹3,600/night): ₹7,200.00
+Taxes & Service GST (12%): ₹864.00
+Convenience Fee: ₹336.00
+Total Amount Paid: ₹8,400.00
+Payment Status: PAID IN FULL
+Payment Method: Net Banking (HDFC Bank Ref: 98210394812)
+Cancellation Policy: Fully refundable up to 24 hours prior to check-in.
+------------------------------------------------------------
+Thank you for choosing Lemon Tree Premier, Hyderabad!

@@ -1,0 +1,33 @@
+DEEPLEARNING.AI & COURSERA
+VERIFIED CERTIFICATE OF SPECIALIZATION COMPLETION
+------------------------------------------------------------
+Certificate ID: CERT-DL-2025-3301
+Issue Date: May 15, 2025
+Platform: Coursera Online Education
+
+This is to certify that
+
+ALEX MORGAN
+
+has successfully completed with Honors the 5-course online specialization:
+
+ADVANCED KNOWLEDGE GRAPHS & NEURO-SYMBOLIC AI
+An online non-credit specialization authorized by DeepLearning.AI
+
+Curriculum Covered:
+- Neural Graph Embeddings & Vector Representations
+- Ontology Engineering & Knowledge Graphs with RDF/OWL
+- Retrieval Augmented Generation (RAG) Architecture
+- Hybrid Neuro-Symbolic Reasoning & Semantic Verification
+- Production Knowledge Base Deployment
+
+Instructors:
+1. Andrew Ng (Founder, DeepLearning.AI)
+2. Dr. Elena Vance (Lead AI Researcher, AI Research Institute)
+
+Issuer: DeepLearning.AI
+Grade Achieved: 98.6% (With Honors)
+Verification Code: DL-AI-KGRAPH-99214
+------------------------------------------------------------
+Verify authenticity at: https://www.coursera.org/verify/specialization/CERT-DL-2025-3301
+Coursera has confirmed the identity of this individual and their participation in the course.
