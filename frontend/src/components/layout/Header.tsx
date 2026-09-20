@@ -64,10 +64,14 @@ export const Header: React.FC = () => {
               navigate('/login');
             }}
             title="Log out"
+            aria-label="Log out"
             style={{
               padding: '6px',
               color: 'var(--color-muted-brown)',
               borderRadius: 'var(--radius-sm)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
           >
             <LogOut size={18} />

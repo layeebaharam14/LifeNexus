@@ -32,6 +32,7 @@
   display: flex;
   min-height: 100vh;
   background-color: var(--color-warm-cream);
+  overflow-x: hidden;
 }
 
 .main-content {
@@ -40,6 +41,7 @@
   flex-direction: column;
   overflow-y: auto;
   max-height: 100vh;
+  min-width: 0;
 }
 
 .page-wrapper {
@@ -48,6 +50,13 @@
   width: 100%;
   margin: 0 auto;
 }
+
+@media (max-width: 768px) {
+  .page-wrapper {
+    padding: 20px 16px;
+  }
+}
+
 
 /* Button & Interactive */
 button {

@@ -19,10 +19,8 @@ const ACTIVE_NAV_ITEMS = [
   { name: 'Life Graph', path: '/app/graph', icon: Network },
   { name: 'Documents', path: '/app/documents', icon: FileText },
   { name: 'Import Documents', path: '/app/import', icon: UploadCloud },
-  { name: 'Privacy Sandbox', path: '/app/privacy', icon: ShieldCheck },
+  { name: 'Privacy Center', path: '/app/privacy', icon: ShieldCheck },
 ];
-
-const UPCOMING_NAV_ITEMS: Array<{ name: string; path: string; icon: any; badge: string }> = [];
 
 
 export const Sidebar: React.FC = () => {
@@ -84,7 +82,7 @@ export const Sidebar: React.FC = () => {
             marginBottom: '4px',
           }}
         >
-          Phase 3 Core
+          Personal Workspace
         </span>
 
         {ACTIVE_NAV_ITEMS.map((item) => {
@@ -109,60 +107,6 @@ export const Sidebar: React.FC = () => {
               <Icon size={18} />
               <span>{item.name}</span>
             </NavLink>
-          );
-        })}
-
-        <div style={{ height: '1px', backgroundColor: 'var(--color-border-subtle)', margin: '12px 14px' }} />
-
-        <span
-          style={{
-            fontSize: '11px',
-            fontWeight: 700,
-            color: 'var(--color-light-brown)',
-            textTransform: 'uppercase',
-            letterSpacing: '0.5px',
-            padding: '4px 14px',
-            marginBottom: '4px',
-          }}
-        >
-          AI Pipeline (Upcoming)
-        </span>
-
-        {UPCOMING_NAV_ITEMS.map((item) => {
-          const Icon = item.icon;
-          return (
-            <div
-              key={item.path}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: '9px 14px',
-                borderRadius: 'var(--radius-md)',
-                fontSize: '13px',
-                color: 'var(--color-light-brown)',
-                cursor: 'not-allowed',
-                opacity: 0.7,
-              }}
-              title="Available in Phase 4: AI Document Intelligence"
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <Icon size={17} />
-                <span>{item.name}</span>
-              </div>
-              <span
-                style={{
-                  fontSize: '10px',
-                  padding: '2px 6px',
-                  borderRadius: '4px',
-                  backgroundColor: 'var(--color-peach-light)',
-                  color: 'var(--color-nexus-orange)',
-                  fontWeight: 600,
-                }}
-              >
-                {item.badge}
-              </span>
-            </div>
           );
         })}
       </nav>

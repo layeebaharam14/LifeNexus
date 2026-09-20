@@ -27,6 +27,7 @@ export const DashboardPage: React.FC = () => {
   const [memStats, setMemStats] = useState<MemoryStats>({ memories: 0, entities: 0, relationships: 0, timelineEvents: 0 });
   const [attentionCount, setAttentionCount] = useState<number>(0);
   const [topInsights, setTopInsights] = useState<GroundedInsight[]>([]);
+  const [searchQuery, setSearchQuery] = useState<string>('');
 
   useEffect(() => {
     const fetchRecentDocs = async () => {
@@ -107,7 +108,7 @@ export const DashboardPage: React.FC = () => {
               border: 'none',
             }}
           >
-            <ShieldCheck size={14} /> Phase 3 Document Ingestion Active
+            <Sparkles size={14} /> Personal Memory Engine Active
           </Badge>
           <h2
             style={{
@@ -118,38 +119,72 @@ export const DashboardPage: React.FC = () => {
               marginBottom: '12px',
             }}
           >
-            Universal Document Repository
+            Everything you've done. Connected.
           </h2>
-          <p style={{ fontSize: '15px', opacity: 0.9, marginBottom: '24px' }}>
-            Securely import and store your personal invoices, warranties, certificates, tickets, and notes.
+          <p style={{ fontSize: '15px', opacity: 0.95, marginBottom: '24px' }}>
+            Natural-language search, connected entity graph, life timeline, and proactive personal insights across your personal documents.
           </p>
 
-          <div
-            onClick={() => navigate('/app/import')}
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (searchQuery.trim()) {
+                navigate(`/app/search?q=${encodeURIComponent(searchQuery.trim())}`);
+              }
+            }}
             style={{
               display: 'flex',
               alignItems: 'center',
               backgroundColor: '#FFFFFF',
               borderRadius: 'var(--radius-md)',
-              padding: '12px 18px',
+              padding: '6px 12px 6px 16px',
               boxShadow: 'var(--shadow-md)',
-              cursor: 'pointer',
-              color: 'var(--color-muted-brown)',
-              gap: '12px',
+              gap: '10px',
             }}
           >
-            <UploadCloud size={20} color="var(--color-nexus-orange)" />
-            <span style={{ fontSize: '15px', flex: 1, color: 'var(--color-deep-cocoa)' }}>
-              Import new documents into your private user-scoped storage
-            </span>
-            <Button variant="primary" size="sm">
-              Import Files
+            <Search size={20} color="var(--color-nexus-orange)" />
+            <input
+              type="text"
+              placeholder="What would you like to remember? (e.g. laptop, warranty, flights)"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              aria-label="Search your memory"
+              style={{
+                flex: 1,
+                border: 'none',
+                outline: 'none',
+                fontSize: '14px',
+                color: 'var(--color-deep-cocoa)',
+                padding: '8px 0',
+                backgroundColor: 'transparent',
+              }}
+            />
+            <Button variant="primary" size="sm" type="submit">
+              Ask Memory
             </Button>
+          </form>
+
+          <div style={{ marginTop: '12px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', opacity: 0.9 }}>
+            <span>Or add new records:</span>
+            <button
+              onClick={() => navigate('/app/import')}
+              style={{
+                color: '#FFFFFF',
+                textDecoration: 'underline',
+                fontWeight: 600,
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                padding: 0,
+              }}
+            >
+              Import Documents &rarr;
+            </button>
           </div>
         </div>
       </div>
 
-      {/* Metrics Row — Honest Phase 3 State (Zero states until Phase 4 AI activation) */}
+      {/* Metrics Row */}
       <div
         style={{
           display: 'grid',
