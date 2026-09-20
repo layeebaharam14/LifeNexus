@@ -5,6 +5,7 @@
 > *"Everything you've done. Connected."*
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-amber.svg)](LICENSE)
+[![Render](https://img.shields.io/badge/Render-Live%20Demo-46E3B7.svg?logo=render&logoColor=white)](https://lifenexus-pouw.onrender.com/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue.svg)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-18.3-cyan.svg)](https://reactjs.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-20+-green.svg)](https://nodejs.org/)
@@ -22,9 +23,10 @@
 ## 🔗 Live Application
 
 > [!TIP]
-> **Deployed Demo URL:**  
-> **👉 [https://your-deployed-app-url.vercel.app](https://your-deployed-app-url.vercel.app)**  
-> *(To update: replace the link above with your live deployed URL from Vercel or Render)*
+> **Production Live URL:**  
+> **👉 [https://lifenexus-pouw.onrender.com/](https://lifenexus-pouw.onrender.com/)**  
+> 
+> *Full single-app production deployment running on Render (Unified Express API + React Vite Client + In-Memory / MongoDB Atlas Storage).*
 
 ---
 
