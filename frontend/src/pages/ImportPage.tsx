@@ -1,142 +1,278 @@
-import React, { useState } from 'react';
-import { UploadCloud, CheckCircle2, Loader2, FileText, AlertCircle } from 'lucide-react';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { UploadCloud, CheckCircle2, ArrowRight, RefreshCw, FileText, AlertTriangle, ShieldCheck } from 'lucide-react';
 import { Card } from '../components/common/Card.js';
 import { Button } from '../components/common/Button.js';
 import { Badge } from '../components/common/Badge.js';
+import { Dropzone } from '../components/upload/Dropzone.js';
+import { FilePreviewItem } from '../components/upload/FilePreviewItem.js';
+import { IngestionProgress } from '../components/upload/IngestionProgress.js';
+import { useUpload } from '../hooks/useUpload.js';
 
 export const ImportPage: React.FC = () => {
-  const [files, setFiles] = useState<File[]>([]);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [processed, setProcessed] = useState(false);
+  const navigate = useNavigate();
+  const {
+    selectedFiles,
+    validationErrors,
+    stage,
+    progress,
+    errorMessage,
+    uploadedDocuments,
+    addFiles,
+    removeFile,
+    clearFiles,
+    upload,
+    isProcessing,
+  } = useUpload();
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      setFiles(Array.from(e.target.files));
-    }
-  };
-
-  const startProcessing = () => {
-    setIsProcessing(true);
-    setTimeout(() => {
-      setIsProcessing(false);
-      setProcessed(true);
-    }, 2000);
+  const handleUploadClick = async () => {
+    await upload();
   };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-      <div>
-        <h2 style={{ fontFamily: 'var(--font-family-display)', fontSize: '28px', fontWeight: 800 }}>
-          Universal Import
-        </h2>
-        <p style={{ fontSize: '14px', color: 'var(--color-muted-brown)' }}>
-          Drop in receipts, warranties, flight tickets, certificates, or personal notes to expand your knowledge graph.
-        </p>
-      </div>
-
-      {/* Drag & Drop Card */}
-      <Card style={{ padding: '48px 24px', textAlign: 'center' }}>
-        <input
-          type="file"
-          id="file-input"
-          multiple
-          accept=".pdf,.png,.jpg,.jpeg,.txt"
-          onChange={handleFileChange}
-          style={{ display: 'none' }}
-        />
-        <label
-          htmlFor="file-input"
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            cursor: 'pointer',
-          }}
-        >
-          <div
+      {/* Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
+        <div>
+          <h2
             style={{
-              width: '64px',
-              height: '64px',
-              borderRadius: '50%',
-              backgroundColor: 'var(--color-peach-light)',
-              color: 'var(--color-nexus-orange)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginBottom: '16px',
+              fontFamily: 'var(--font-family-display)',
+              fontSize: '28px',
+              fontWeight: 800,
+              letterSpacing: '-0.5px',
+              color: 'var(--color-deep-cocoa)',
+              marginBottom: '6px',
             }}
           >
-            <UploadCloud size={32} />
-          </div>
-          <h3 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '6px' }}>
-            Click to upload or drag and drop
-          </h3>
-          <p style={{ fontSize: '13px', color: 'var(--color-muted-brown)', marginBottom: '16px' }}>
-            Supports PDF, PNG, JPG, JPEG, and TXT (up to 15MB per file)
+            Universal Document Ingestion
+          </h2>
+          <p style={{ fontSize: '14px', color: 'var(--color-muted-brown)' }}>
+            Import personal documents to extract raw text and build ground-truth knowledge anchors.
           </p>
-          <Button variant="secondary" size="md">
-            Select Files From Device
-          </Button>
-        </label>
-      </Card>
+        </div>
 
-      {/* Staged Files and Progress */}
-      {files.length > 0 && (
-        <Card>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-            <h3 style={{ fontSize: '16px', fontWeight: 700 }}>Staged Files ({files.length})</h3>
-            {!processed && (
-              <Button
-                variant="primary"
-                size="md"
-                onClick={startProcessing}
-                isLoading={isProcessing}
-                icon={<UploadCloud size={16} />}
-              >
-                Process & Connect Memories
-              </Button>
-            )}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Badge variant="peach" icon={<ShieldCheck size={12} />}>
+            Local Isolated Storage
+          </Badge>
+          <Badge variant="neutral">SHA-256 Deduplication</Badge>
+        </div>
+      </div>
+
+      {/* Validation Errors Alert */}
+      {validationErrors.length > 0 && (
+        <div
+          style={{
+            padding: '14px 18px',
+            borderRadius: 'var(--radius-md)',
+            backgroundColor: '#FEF2F2',
+            border: '1px solid #FCA5A5',
+            color: '#991B1B',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '6px',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 700, fontSize: '14px' }}>
+            <AlertTriangle size={18} />
+            Some selected files could not be added:
+          </div>
+          <ul style={{ margin: 0, paddingLeft: '24px', fontSize: '13px' }}>
+            {validationErrors.map((err, idx) => (
+              <li key={idx}>
+                <strong>{err.file.name}</strong>: {err.error}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Ingestion Error Alert */}
+      {errorMessage && (
+        <div
+          style={{
+            padding: '14px 18px',
+            borderRadius: 'var(--radius-md)',
+            backgroundColor: '#FEF2F2',
+            border: '1px solid #FCA5A5',
+            color: '#991B1B',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            fontSize: '14px',
+          }}
+        >
+          <AlertTriangle size={18} />
+          <span>{errorMessage}</span>
+        </div>
+      )}
+
+      {/* Stage: Ingestion Progress */}
+      {isProcessing && (
+        <IngestionProgress
+          stage={stage}
+          progress={progress}
+          totalFiles={selectedFiles.length}
+        />
+      )}
+
+      {/* Stage: Success Summary */}
+      {stage === 'complete' && uploadedDocuments.length > 0 && (
+        <Card style={{ padding: '32px', backgroundColor: 'var(--color-cream-surface)' }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '16px',
+              marginBottom: '24px',
+            }}
+          >
+            <div
+              style={{
+                width: '48px',
+                height: '48px',
+                borderRadius: '50%',
+                backgroundColor: 'var(--color-sage-accent)',
+                color: '#FFFFFF',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <CheckCircle2 size={28} />
+            </div>
+            <div>
+              <h3 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--color-deep-cocoa)' }}>
+                Ingestion Completed Successfully
+              </h3>
+              <p style={{ fontSize: '14px', color: 'var(--color-muted-brown)' }}>
+                {uploadedDocuments.length} document{uploadedDocuments.length > 1 ? 's' : ''} stored and parsed into raw text representations.
+              </p>
+            </div>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {files.map((file, idx) => (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '28px' }}>
+            {uploadedDocuments.map((doc) => (
               <div
-                key={idx}
+                key={doc.id}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   padding: '12px 16px',
                   borderRadius: 'var(--radius-md)',
-                  background: 'var(--color-warm-cream)',
+                  backgroundColor: 'var(--color-warm-cream)',
                   border: '1px solid var(--color-border)',
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <FileText size={20} color="var(--color-nexus-orange)" />
+                  <FileText size={18} color="var(--color-nexus-orange)" />
                   <div>
-                    <p style={{ fontSize: '14px', fontWeight: 600 }}>{file.name}</p>
-                    <p style={{ fontSize: '12px', color: 'var(--color-muted-brown)' }}>
-                      {(file.size / 1024).toFixed(1)} KB
-                    </p>
+                    <span style={{ fontSize: '14px', fontWeight: 600 }}>{doc.originalName}</span>
+                    <div style={{ display: 'flex', gap: '8px', fontSize: '12px', color: 'var(--color-muted-brown)' }}>
+                      <span>Type: {doc.documentType}</span>
+                      <span>•</span>
+                      <span>Parser: {doc.extractionMethod || 'native'}</span>
+                    </div>
                   </div>
                 </div>
 
-                {isProcessing ? (
-                  <Badge variant="peach" icon={<Loader2 size={12} className="animate-spin" />}>
-                    Extracting Knowledge...
-                  </Badge>
-                ) : processed ? (
-                  <Badge variant="success" icon={<CheckCircle2 size={12} />}>
-                    Connected to Graph
-                  </Badge>
-                ) : (
-                  <Badge variant="neutral">Ready</Badge>
-                )}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  {doc.isDuplicate ? (
+                    <Badge variant="orange">Existing Duplicate (Preserved)</Badge>
+                  ) : (
+                    <Badge variant="success">Parsed & Saved</Badge>
+                  )}
+                </div>
               </div>
             ))}
           </div>
+
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+            <Button variant="secondary" icon={<RefreshCw size={16} />} onClick={clearFiles}>
+              Ingest More Files
+            </Button>
+            <Button
+              variant="primary"
+              icon={<ArrowRight size={16} />}
+              onClick={() => navigate('/app/documents')}
+            >
+              View Ingested Documents
+            </Button>
+          </div>
         </Card>
+      )}
+
+      {/* Main Upload Area (when idle or staging) */}
+      {stage !== 'complete' && (
+        <>
+          <Dropzone onFilesSelected={addFiles} disabled={isProcessing} />
+
+          {/* Staged Files List */}
+          {selectedFiles.length > 0 && (
+            <Card>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: '20px',
+                  flexWrap: 'wrap',
+                  gap: '12px',
+                }}
+              >
+                <div>
+                  <h3 style={{ fontSize: '16px', fontWeight: 700, color: 'var(--color-deep-cocoa)' }}>
+                    Files Staged for Ingestion ({selectedFiles.length})
+                  </h3>
+                  <p style={{ fontSize: '12px', color: 'var(--color-muted-brown)' }}>
+                    Total size:{' '}
+                    {(
+                      selectedFiles.reduce((acc, f) => acc + f.size, 0) /
+                      (1024 * 1024)
+                    ).toFixed(2)}{' '}
+                    MB
+                  </p>
+                </div>
+
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    disabled={isProcessing}
+                    onClick={clearFiles}
+                  >
+                    Clear All
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="primary"
+                    size="md"
+                    disabled={isProcessing}
+                    isLoading={isProcessing}
+                    icon={<UploadCloud size={16} />}
+                    onClick={handleUploadClick}
+                  >
+                    Start Ingestion Pipeline
+                  </Button>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                {selectedFiles.map((file, idx) => (
+                  <FilePreviewItem
+                    key={`${file.name}-${idx}`}
+                    file={file}
+                    onRemove={() => removeFile(idx)}
+                    disabled={isProcessing}
+                    status={isProcessing ? 'uploading' : 'staged'}
+                  />
+                ))}
+              </div>
+            </Card>
+          )}
+        </>
       )}
     </div>
   );

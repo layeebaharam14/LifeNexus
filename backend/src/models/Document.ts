@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document as MongooseDocument } from 'mongoose';
 
 export interface IDocumentRecord extends MongooseDocument {
-  userId: mongoose.Types.ObjectId;
+  userId: string;
   fileName: string;
   originalName: string;
   mimeType: string;
@@ -11,7 +11,8 @@ export interface IDocumentRecord extends MongooseDocument {
   extractedText: string;
   documentType: string;
   processingStatus: 'PENDING' | 'PROCESSING' | 'PROCESSED' | 'FAILED';
-  errorMessage?: string;
+  errorMessage?: string | null;
+  uploadedAt: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -19,8 +20,7 @@ export interface IDocumentRecord extends MongooseDocument {
 const DocumentSchema = new Schema<IDocumentRecord>(
   {
     userId: {
-      type: Schema.Types.ObjectId,
-      ref: 'User',
+      type: String,
       required: true,
       index: true,
     },
@@ -55,7 +55,7 @@ const DocumentSchema = new Schema<IDocumentRecord>(
     },
     documentType: {
       type: String,
-      default: 'Unknown',
+      default: 'Document',
     },
     processingStatus: {
       type: String,
@@ -67,13 +67,27 @@ const DocumentSchema = new Schema<IDocumentRecord>(
       type: String,
       default: null,
     },
+    uploadedAt: {
+      type: Date,
+      default: Date.now,
+      index: true,
+    },
   },
   {
     timestamps: true,
+    toJSON: {
+      transform: (_doc, ret: any) => {
+        ret.id = ret._id ? ret._id.toString() : ret.id;
+        delete ret._id;
+        delete ret.__v;
+        return ret;
+      },
+    },
   }
 );
 
 // Compound index for user + fileHash deduplication
 DocumentSchema.index({ userId: 1, fileHash: 1 });
+DocumentSchema.index({ userId: 1, uploadedAt: -1 });
 
 export const DocumentModel = mongoose.model<IDocumentRecord>('Document', DocumentSchema);

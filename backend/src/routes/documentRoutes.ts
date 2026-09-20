@@ -1,23 +1,31 @@
 import { Router } from 'express';
 import { authenticateUser } from '../middleware/authMiddleware.js';
 import { upload } from '../middleware/uploadMiddleware.js';
+import {
+  uploadDocumentsController,
+  listDocumentsController,
+  getDocumentDetailController,
+  getDocumentContentController,
+  deleteDocumentController,
+} from '../controllers/documentController.js';
 
 export const documentRoutes = Router();
 
+// All document routes require authentication
 documentRoutes.use(authenticateUser);
 
-documentRoutes.get('/', async (_req, res) => {
-  res.json({ success: true, data: [] });
-});
+// Document upload (single or multiple files)
+documentRoutes.post('/upload', upload.array('files', 10), uploadDocumentsController);
 
-documentRoutes.post('/upload', upload.array('files', 10), async (req, res) => {
-  res.json({ success: true, message: 'Files uploaded successfully', files: req.files });
-});
+// List user's documents
+documentRoutes.get('/', listDocumentsController);
 
-documentRoutes.get('/:id', async (req, res) => {
-  res.json({ success: true, id: req.params.id });
-});
+// Get specific document metadata
+documentRoutes.get('/:id', getDocumentDetailController);
 
-documentRoutes.delete('/:id', async (req, res) => {
-  res.json({ success: true, deletedId: req.params.id });
-});
+// Get extracted content of a document
+documentRoutes.get('/:id/content', getDocumentContentController);
+
+// Delete user's document
+documentRoutes.delete('/:id', deleteDocumentController);
+

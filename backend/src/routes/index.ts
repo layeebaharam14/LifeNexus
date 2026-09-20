@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { authRoutes } from './authRoutes.js';
+import { documentRoutes } from './documentRoutes.js';
 import { ApiResponse } from '../types/api.js';
 
 export const apiRouter = Router();
@@ -18,3 +19,7 @@ apiRouter.get('/health', (_req: Request, res: Response<ApiResponse>) => {
 
 // Authentication Routes
 apiRouter.use('/auth', authRoutes);
+
+// Document Routes (Phase 3)
+apiRouter.use('/documents', documentRoutes);
+

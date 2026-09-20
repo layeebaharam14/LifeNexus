@@ -4,6 +4,11 @@ import { AuthProvider, useAuth } from './context/AuthContext.js';
 import { LandingPage } from './pages/LandingPage.js';
 import { LoginPage } from './pages/LoginPage.js';
 import { RegisterPage } from './pages/RegisterPage.js';
+import { MainLayout } from './components/layout/MainLayout.js';
+import { DashboardPage } from './pages/DashboardPage.js';
+import { ImportPage } from './pages/ImportPage.js';
+import { DocumentsPage } from './pages/DocumentsPage.js';
+import { PrivacyPage } from './pages/PrivacyPage.js';
 import { AuthenticatedWorkspacePage } from './pages/AuthenticatedWorkspacePage.js';
 
 // Protected Route Guard for Authenticated Users Only
@@ -43,7 +48,7 @@ const PublicAuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) 
   }
 
   if (isAuthenticated) {
-    return <Navigate to="/app" replace />;
+    return <Navigate to="/app/dashboard" replace />;
   }
 
   return <>{children}</>;
@@ -80,18 +85,18 @@ export const App: React.FC = () => {
             path="/app"
             element={
               <ProtectedRoute>
-                <AuthenticatedWorkspacePage />
+                <MainLayout />
               </ProtectedRoute>
             }
-          />
-          <Route
-            path="/app/*"
-            element={
-              <ProtectedRoute>
-                <AuthenticatedWorkspacePage />
-              </ProtectedRoute>
-            }
-          />
+          >
+            <Route index element={<Navigate to="/app/dashboard" replace />} />
+            <Route path="dashboard" element={<DashboardPage />} />
+            <Route path="import" element={<ImportPage />} />
+            <Route path="documents" element={<DocumentsPage />} />
+            <Route path="privacy" element={<PrivacyPage />} />
+            <Route path="profile" element={<AuthenticatedWorkspacePage />} />
+            <Route path="*" element={<Navigate to="/app/dashboard" replace />} />
+          </Route>
 
           {/* Fallback */}
           <Route path="*" element={<Navigate to="/" replace />} />
@@ -100,3 +105,4 @@ export const App: React.FC = () => {
     </AuthProvider>
   );
 };
+

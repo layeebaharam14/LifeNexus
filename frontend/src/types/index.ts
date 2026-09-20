@@ -20,8 +20,14 @@ export interface DocumentRecord {
   documentType: string;
   processingStatus: 'PENDING' | 'PROCESSING' | 'PROCESSED' | 'FAILED';
   uploadedAt: string;
+  hasExtractedText?: boolean;
+  extractedText?: string;
+  errorMessage?: string;
+  isDuplicate?: boolean;
+  extractionMethod?: 'text' | 'pdf' | 'ocr' | 'scanned_pdf' | 'none';
   extractedEntitiesCount?: number;
 }
+
 
 export interface EntityNode {
   id: string;

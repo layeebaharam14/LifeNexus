@@ -76,3 +76,61 @@ export async function apiPost<T = any>(endpoint: string, body?: any): Promise<Ap
     };
   }
 }
+
+export async function apiUpload<T = any>(endpoint: string, formData: FormData): Promise<ApiResponse<T>> {
+  try {
+    const url = endpoint.startsWith('http') ? endpoint : `${API_BASE_URL}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
+    
+    // Auth header without Content-Type so browser sets boundary automatically
+    const headers: HeadersInit = {};
+    const token = localStorage.getItem('lifenexus_token');
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers,
+      body: formData,
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      return {
+        success: false,
+        error: data.error || data.message || `Upload failed with status ${response.status}`,
+      };
+    }
+    return data;
+  } catch (error: any) {
+    return {
+      success: false,
+      error: error.message || 'Network upload failed',
+    };
+  }
+}
+
+export async function apiDelete<T = any>(endpoint: string): Promise<ApiResponse<T>> {
+  try {
+    const url = endpoint.startsWith('http') ? endpoint : `${API_BASE_URL}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
+    const response = await fetch(url, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      return {
+        success: false,
+        error: data.error || data.message || `Delete failed with status ${response.status}`,
+      };
+    }
+    return data;
+  } catch (error: any) {
+    return {
+      success: false,
+      error: error.message || 'Network request failed',
+    };
+  }
+}
+
